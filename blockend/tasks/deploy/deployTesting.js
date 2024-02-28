@@ -1,4 +1,3 @@
-const { network } = require("hardhat");
 const { networks } = require("../../networks");
 
 task("deploy-testing", "Deploys the Testing contract")
