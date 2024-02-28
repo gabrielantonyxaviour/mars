@@ -44,7 +44,8 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      moonbeamAlpha: networks.moonbeamAlpha.verifyApiKey,
+      ethereumSepolia: networks.ethereumSepolia.verifyApiKey,
+      moonbaseAlpha: networks.moonbaseAlpha.verifyApiKey,
     },
   },
   gasReporter: {
