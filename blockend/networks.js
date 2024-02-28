@@ -24,7 +24,9 @@ const networks = {
     chainId: 1287,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "ETH",
+    wormholeChainId: "16",
     wormholeCoreBridge: "0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901",
+    testing: "0x4ab8f50796b059aE5C8b8534afC6bb4c84912ff6",
   },
   ethereumSepolia: {
     url: "https://ethereum-sepolia-rpc.publicnode.com",
@@ -35,17 +37,22 @@ const networks = {
     chainId: 11155111,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "ETH",
+
+    wormholeCoreBridge: "0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901",
   },
-  // polygonMumbai: {
-  //   url: "https://rpc-mumbai.maticvigil.com",
-  //   gasPrice: undefined,
-  //   nonce: undefined,
-  //   accounts,
-  //   // verifyApiKey: process.env.SCROLL_API_KEY || "UNSET",
-  //   chainId: 80001,
-  //   confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
-  //   nativeCurrencySymbol: "MATIC",
-  // },
+  polygonMumbai: {
+    url: "https://polygon-mumbai-pokt.nodies.app",
+    gasPrice: undefined,
+    nonce: undefined,
+    accounts,
+    verifyApiKey: process.env.POLYGON_API_KEY || "UNSET",
+    chainId: 80001,
+    confirmations: 5,
+    nativeCurrencySymbol: "MATIC",
+    wormholeChainId: "5",
+    wormholeCoreBridge: "0x0CBE91CF822c73C2315FB05100C2F714765d5c20",
+    testing: "0x615270a5CBA6C1e34D7F8BCB5D26a5BC9285fA20",
+  },
   // injectiveTestnet:{
 
   // },

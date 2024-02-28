@@ -20,22 +20,6 @@ module.exports = {
         version: "0.8.20",
         settings: SOLC_SETTINGS,
       },
-      {
-        version: "0.8.7",
-        settings: SOLC_SETTINGS,
-      },
-      {
-        version: "0.7.0",
-        settings: SOLC_SETTINGS,
-      },
-      {
-        version: "0.6.6",
-        settings: SOLC_SETTINGS,
-      },
-      {
-        version: "0.4.24",
-        settings: SOLC_SETTINGS,
-      },
     ],
   },
 
@@ -46,6 +30,7 @@ module.exports = {
     apiKey: {
       ethereumSepolia: networks.ethereumSepolia.verifyApiKey,
       moonbaseAlpha: networks.moonbaseAlpha.verifyApiKey,
+      polygonMumbai: networks.polygonMumbai.verifyApiKey,
     },
   },
   gasReporter: {

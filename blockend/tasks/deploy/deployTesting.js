@@ -12,10 +12,13 @@ task("deploy-testing", "Deploys the Testing contract")
 
     console.log("\n__Compiling Contracts__");
     await run("compile");
-
+    console.log({
+      chainId: networks[network.name].chainId,
+      wormholeCoreBridge: networks[network.name].wormholeCoreBridge,
+    });
     const testingContractFactory = await ethers.getContractFactory("Testing");
     const testingContract = await testingContractFactory.deploy(
-      networks[network.name].chainId,
+      networks[network.name].wormholeChainId,
       networks[network.name].wormholeCoreBridge
     );
 
@@ -49,7 +52,7 @@ task("deploy-testing", "Deploys the Testing contract")
         await run("verify:verify", {
           address: testingContract.address,
           constructorArguments: [
-            networks[network.name].chainId,
+            networks[network.name].wormholeChainId,
             networks[network.name].wormholeCoreBridge,
           ],
         });
