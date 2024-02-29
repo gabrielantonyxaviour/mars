@@ -136,11 +136,9 @@ export default function Generate() {
               </p>
               <button
                 onClick={async () => {}}
-                // trigger Transactoin
-
-                disabled={count != 0 || chain?.id != 1287}
+                disabled={count != 0 || chain?.id != 1287 || prompt == ""}
                 className={`${
-                  count != 0 || chain?.id != 1287
+                  count != 0 || chain?.id != 1287 || prompt == ""
                     ? "bg-[#25272b] text-[#5b5e5b]"
                     : "bg-white text-black"
                 } px-4 py-2 rounded-xl font-semibold `}
@@ -151,7 +149,7 @@ export default function Generate() {
           </div>
           <div>
             <div className=" border border-white border-dashed h-[500px] w-[500px] rounded-xl ml-16">
-              {count == 2 ? (
+              {count == 1 ? (
                 <img src={imageAlt} alt="gen-image" className="rounded-xl" />
               ) : (
                 messageId != "" && (
@@ -179,11 +177,7 @@ export default function Generate() {
                 <p>Tx Hash</p>
                 <a
                   className="text-sm text-[#9c9e9e] "
-                  href={
-                    chain?.id == 88
-                      ? "https://vicscan.xyz/tx/" + txHash
-                      : "https://testnet.vicscan.xyz/tx/" + txHash
-                  }
+                  href={"https://moonbase.moonscan.io/tx/" + txHash}
                   target={"_blank"}
                 >
                   {txHash.substring(0, 10) +
