@@ -4,6 +4,32 @@ pragma solidity ^0.8.12;
 
 contract VenusProtocol {
 
+    enum OrderStatus {
+        DOES_NOT_EXIST,
+        PENDING,
+        COMPLETED,
+        FAILED
+    }
+    struct Listing {
+        address seller;
+        address tokenAddress;
+        uint256 tokenId;
+        uint256 wormholeChainId;
+        uint256 priceInNative;
+        bytes signature;
+    }
+
+    struct Order {
+        uint256 orderId;
+        uint256 listingId;
+        uint256 wormholeChainId;
+        address buyer;
+        uint256 pricePaidInNative;
+        OrderStatus status;
+    }
+
+    mapping(uint256 => Listing) public listings;
+    mapping(uint256 => Order) public orders;
     uint256 public orderIdCounter;
     uint256 public listingIdCounter;
     
@@ -19,6 +45,7 @@ contract VenusProtocol {
     }
 
     function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice) public {
+        
         emit NFTListed(listingIdCounter, msg.sender, tokenAddress, tokenId, nativePrice);
         listingIdCounter++;
     }
