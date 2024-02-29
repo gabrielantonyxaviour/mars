@@ -26,56 +26,56 @@ export default function ChainDropdown({ count }: { count: any }) {
       {chainDropdown && (
         <div className="flex flex-col">
           <ChainComponent
-            chain="moonbeam"
+            chainId={"1287"}
             currentChain={chain}
             chainName="Moonbase"
             setChain={setChain}
             count={count.moonbeam}
           />
           <ChainComponent
-            chain="ethereum"
+            chainId="11155111"
             currentChain={chain}
             chainName="Ethereum"
             setChain={setChain}
             count={count.ethereum}
           />
           <ChainComponent
-            chain="polygon"
+            chainId="polygon"
             currentChain={chain}
-            chainName="Polygon"
+            chainName="80001"
             setChain={setChain}
             count={count.polygon}
           />
           <ChainComponent
-            chain="arbitrum"
+            chainId="421614"
             currentChain={chain}
             chainName="Arbitrum"
             setChain={setChain}
             count={count.arbitrum}
           />
           <ChainComponent
-            chain="linea"
+            chainId="59140"
             currentChain={chain}
             chainName="Linea"
             setChain={setChain}
             count={count.linea}
           />
           <ChainComponent
-            chain="zircuit"
+            chainId="48899"
             currentChain={chain}
             chainName="Zircuit"
             setChain={setChain}
             count={count.zircuit}
           />
           <ChainComponent
-            chain="base"
+            chainId="84532"
             currentChain={chain}
             chainName="Base"
             setChain={setChain}
             count={count.base}
           />
           <ChainComponent
-            chain="injective"
+            chainId="2424"
             currentChain={chain}
             chainName="Injective"
             setChain={setChain}
