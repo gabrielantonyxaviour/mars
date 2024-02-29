@@ -10,18 +10,16 @@ const { MongoClient } = require("mongodb");
 const client = new MongoClient(process.env.MONGO_URI);
 const db = client.db("venus");
 
-let fetch;
-(async () => {
-  const { default: fetchModule } = await import("node-fetch");
-  fetch = fetchModule;
-})();
-
 const morgan = require("morgan");
 app.use(morgan("common"));
+
+const api = require("./routes/api");
+app.use("/api", api);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/* DRPC Providers Starts */
 const etherumSepoliaProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=sepolia&dkey=${process.env.DRPC_API_KEY}`
 );
@@ -42,6 +40,18 @@ const arbitrumSepoliaProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=arbitrum-sepolia&dkey=${process.env.DRPC_API_KEY}`
 );
 const arbitrumSepoliaContractAddress = process.env.ARBITRUM_SEPOLIA;
+/* DRPC Providers Ends */
+
+/* Custom Providers Starts */
+const injectiveEvmProvider = new ethers.providers.JsonRpcProvider(
+  "https://testnet.rpc.inevm.com/http"
+);
+const injectiveEvmContractAddress = process.env.INJECTIVE_EVM;
+const zircuitProvider = new ethers.providers.JsonRpcProvider(
+  "https://zircuit1.p2pify.com"
+);
+const zircuitContractAddress = process.env.ZIRCUIT_TESTNET;
+/* Custom Providers Ends */
 
 const ethereumSepoliaInstance = new ethers.Contract(
   ethereumSepoliaContractAddress,
@@ -67,6 +77,16 @@ const arbitrumSepoliaInstance = new ethers.Contract(
   arbitrumSepoliaContractAddress,
   contractABI,
   arbitrumSepoliaProvider
+);
+const injectiveEvmInstance = new ethers.Contract(
+  injectiveEvmContractAddress,
+  contractABI,
+  injectiveEvmProvider
+);
+const zircuitInstance = new ethers.Contract(
+  zircuitContractAddress,
+  contractABI,
+  zircuitProvider
 );
 
 ethereumSepoliaInstance.on("*", async (event) => {
@@ -95,6 +115,7 @@ lineaGoerliInstance.on("*", async (event) => {
     timestamp: Date.now(),
     network: "linea-goerli",
   };
+  await db.collection("events").insertOne(data);
   console.log("Linea Goerli:", data);
 });
 
@@ -114,49 +135,44 @@ arbitrumSepoliaInstance.on("*", async (event) => {
     timestamp: Date.now(),
     network: "arbitrum-sepolia",
   };
+  await db.collection("events").insertOne(data);
   console.log("Arbitrum Sepolia:", data);
 });
 
-const harpieApiKey = process.env.HARPIE_API_KEY;
+injectiveEvmInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "injective-evm",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Injective EVM:", data);
+});
+
+zircuitInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "zircuit",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Zircuit:", data);
+});
 
 app.get("/", (req, res) => {
   res.json({
     success: true,
     data: {
-      connecterAddress: {
+      connectorAddress: {
         ethereumSepolia: ethereumSepoliaContractAddress,
         polygonMumbai: polygonMumbaiContractAddress,
         lineaGoerli: lineaGoerliContractAddress,
         baseSepolia: baseSepoliaContractAddress,
         arbitrumSepolia: arbitrumSepoliaContractAddress,
+        injectiveEvm: injectiveEvmContractAddress,
+        zircuit: zircuitContractAddress
       },
     },
-  });
-});
-
-app.post("/verify-addresses", async (req, res) => {
-  const { addresses } = req.body;
-  const endPoint = "https://api.harpie.io/v2/validateAddress";
-  const results = {};
-  await Promise.all(
-    addresses.map(async (address) => {
-      const response = await fetch(endPoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address,
-          apiKey: harpieApiKey,
-        }),
-      });
-      const data = await response.json();
-      results[address] = data;
-    })
-  );
-  res.json({
-    success: true,
-    data: results,
   });
 });
 
