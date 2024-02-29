@@ -5,7 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { task_id } = req.body;
+  const { task_id } = JSON.parse(req.body);
 
   const imageRes = await fetch(`${MIDJOURNEY_BASE_URL}/fetch`, {
     method: "POST",
@@ -20,7 +20,7 @@ export default async function handler(
 
   const imageResponseData = await imageRes.json();
   console.log("\n=====================");
-  console.log("IMAGE GENERATION MESSAGE DATA");
+  console.log("IMAGE FETCH MESSAGE DATA");
   console.log(imageResponseData);
   console.log("=====================");
 

@@ -5,7 +5,7 @@ const nextConfig = {
       "cloudflare-ipfs.com",
       "otvzzmqknnjthpuwmrpb.supabase.co",
       "amber-accessible-porpoise-584.mypinata.cloud",
-      "cdn.midjourney.com",
+      "img.midjourneyapi.xyz",
     ],
   },
 };

@@ -5,8 +5,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { task_id, index } = req.body;
-
+  const { task_id, index } = JSON.parse(req.body);
+  console.log(task_id);
+  console.log(task_id, index);
   const imageRes = await fetch(`${MIDJOURNEY_BASE_URL}/upscale`, {
     method: "POST",
     headers: {
@@ -21,7 +22,7 @@ export default async function handler(
 
   const imageResponseData = await imageRes.json();
   console.log("\n=====================");
-  console.log("IMAGE GENERATION MESSAGE DATA");
+  console.log("IMAGE UPSCALE MESSAGE DATA");
   console.log(imageResponseData);
   console.log("=====================");
 
