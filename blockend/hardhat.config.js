@@ -28,10 +28,48 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      ethereumSepolia: networks.ethereumSepolia.verifyApiKey,
+      sepolia: networks.ethereumSepolia.verifyApiKey,
       moonbaseAlpha: networks.moonbaseAlpha.verifyApiKey,
       polygonMumbai: networks.polygonMumbai.verifyApiKey,
+      arbitrumSepolia: networks.arbitrumSepolia.verifyApiKey,
+      baseSepolia: networks.baseSepolia.verifyApiKey,
+      lineaTestnet: networks.lineaTestnet.verifyApiKey,
+      zircuitTestnet: networks.zircuitTestnet.verifyApiKey,
     },
+    customChains: [
+      {
+        network: "arbitrumSepolia",
+        chainId: networks.arbitrumSepolia.chainId,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://arbiscan.io/",
+        },
+      },
+      {
+        network: "baseSepolia",
+        chainId: networks.baseSepolia.chainId,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://basescan.org/",
+        },
+      },
+      {
+        network: "lineaTestnet",
+        chainId: networks.lineaTestnet.chainId,
+        urls: {
+          apiURL: "https://api-testnet.lineascan.build/api",
+          browserURL: "https://lineascan.build/",
+        },
+      },
+      {
+        network: "zircuitTestnet",
+        chainId: networks.zircuitTestnet.chainId,
+        urls: {
+          apiURL: "",
+          browserURL: "https://explorer.zircuit.com/",
+        },
+      },
+    ],
   },
   gasReporter: {
     enabled: REPORT_GAS,

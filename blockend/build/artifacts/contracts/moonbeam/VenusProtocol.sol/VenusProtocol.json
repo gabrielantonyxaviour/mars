@@ -1,0 +1,239 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "VenusProtocol",
+  "sourceName": "contracts/moonbeam/VenusProtocol.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "listingId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "priceInNative",
+          "type": "uint256"
+        }
+      ],
+      "name": "NFTListed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        }
+      ],
+      "name": "NftPurchaseCompleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        }
+      ],
+      "name": "NftPurchaseFailed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "foreignChainListingId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "wormholeChainId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "buyer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "pricePaidInNative",
+          "type": "uint256"
+        }
+      ],
+      "name": "NftPurchaseInitiated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "getListingIdCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getOrderIdCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "nativePrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "listNft",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "listingIdCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "isSuccess",
+          "type": "bool"
+        }
+      ],
+      "name": "nftPurchaseCallback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "orderIdCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "listingId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wormholeChainId",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchaseNFT",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "orderId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506103dc806100206000396000f3fe6080604052600436106100705760003560e01c806374fc77331161004e57806374fc7733146100d0578063ad4451a3146100e5578063be374423146100f8578063c922b17c1461010e57600080fd5b80631931d35c14610075578063231701e91461009857806328292a4f146100ae575b600080fd5b34801561008157600080fd5b506001545b60405190815260200160405180910390f35b3480156100a457600080fd5b5061008660015481565b3480156100ba57600080fd5b506100ce6100c93660046102cc565b61012e565b005b3480156100dc57600080fd5b50600054610086565b6100866100f3366004610311565b6101b8565b34801561010457600080fd5b5061008660005481565b34801561011a57600080fd5b506100ce610129366004610333565b610225565b8015610188576040805184815273ffffffffffffffffffffffffffffffffffffffff841660208201527f7981190ed176314aeac9bcfeef17987b901d0e614ea542487b341c451000dc1891015b60405180910390a1505050565b6040518381527f1855835a910bf08f0d7e03957c4c8f68d92ea4b4d478f68fae44cf7825a10fee9060200161017b565b60008054604080519182526020820185905281018390523360608201523460808201527f53135e58ec7d6234efa7b364a147166ce2b41dcb8424dc7d1cb63b870b71671c9060a00160405180910390a160008054908061021783610366565b909155506000949350505050565b6001546040805191825233602083015273ffffffffffffffffffffffffffffffffffffffff8516828201526060820184905260808201839052517fb0fe4922ac99799c17a4130d5c045ba2ecdf6e15b75b9ea84aaf0dc28724a42b9181900360a00190a16001805490600061029983610366565b9190505550505050565b803573ffffffffffffffffffffffffffffffffffffffff811681146102c757600080fd5b919050565b6000806000606084860312156102e157600080fd5b833592506102f1602085016102a3565b91506040840135801515811461030657600080fd5b809150509250925092565b6000806040838503121561032457600080fd5b50508035926020909101359150565b60008060006060848603121561034857600080fd5b610351846102a3565b95602085013595506040909401359392505050565b60006001820161039f577f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b506001019056fea26469706673582212201aa95e52f0ba08fa769455798087c4e634aca98784a0ba33ec9a0d034512c71864736f6c63430008140033",
+  "deployedBytecode": "0x6080604052600436106100705760003560e01c806374fc77331161004e57806374fc7733146100d0578063ad4451a3146100e5578063be374423146100f8578063c922b17c1461010e57600080fd5b80631931d35c14610075578063231701e91461009857806328292a4f146100ae575b600080fd5b34801561008157600080fd5b506001545b60405190815260200160405180910390f35b3480156100a457600080fd5b5061008660015481565b3480156100ba57600080fd5b506100ce6100c93660046102cc565b61012e565b005b3480156100dc57600080fd5b50600054610086565b6100866100f3366004610311565b6101b8565b34801561010457600080fd5b5061008660005481565b34801561011a57600080fd5b506100ce610129366004610333565b610225565b8015610188576040805184815273ffffffffffffffffffffffffffffffffffffffff841660208201527f7981190ed176314aeac9bcfeef17987b901d0e614ea542487b341c451000dc1891015b60405180910390a1505050565b6040518381527f1855835a910bf08f0d7e03957c4c8f68d92ea4b4d478f68fae44cf7825a10fee9060200161017b565b60008054604080519182526020820185905281018390523360608201523460808201527f53135e58ec7d6234efa7b364a147166ce2b41dcb8424dc7d1cb63b870b71671c9060a00160405180910390a160008054908061021783610366565b909155506000949350505050565b6001546040805191825233602083015273ffffffffffffffffffffffffffffffffffffffff8516828201526060820184905260808201839052517fb0fe4922ac99799c17a4130d5c045ba2ecdf6e15b75b9ea84aaf0dc28724a42b9181900360a00190a16001805490600061029983610366565b9190505550505050565b803573ffffffffffffffffffffffffffffffffffffffff811681146102c757600080fd5b919050565b6000806000606084860312156102e157600080fd5b833592506102f1602085016102a3565b91506040840135801515811461030657600080fd5b809150509250925092565b6000806040838503121561032457600080fd5b50508035926020909101359150565b60008060006060848603121561034857600080fd5b610351846102a3565b95602085013595506040909401359392505050565b60006001820161039f577f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b506001019056fea26469706673582212201aa95e52f0ba08fa769455798087c4e634aca98784a0ba33ec9a0d034512c71864736f6c63430008140033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
