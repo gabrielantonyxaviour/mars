@@ -3,7 +3,8 @@ task("mint-test-nft", "Mints test nft to the user").setAction(
   async (taskArgs, hre) => {
     try {
       const owner = "0x0429A2Da7884CA14E53142988D5845952fE4DF6a";
-      const tokenUri = "https://picsum.photos/200/300";
+      const tokenUri =
+        "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmezqgKzLus4JMwdMZ4iAVz3kLQ3QUkBCpoVZMJ16WeSND";
       const functionHash = ethers.utils
         .id("safeMint(address,string)")
         .slice(0, 10);

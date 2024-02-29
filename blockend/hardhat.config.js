@@ -35,6 +35,7 @@ module.exports = {
       baseSepolia: networks.baseSepolia.verifyApiKey,
       lineaTestnet: networks.lineaTestnet.verifyApiKey,
       zircuitTestnet: networks.zircuitTestnet.verifyApiKey,
+      injectiveEvmTestnet: networks.injectiveEvmTestnet.verifyApiKey,
     },
     customChains: [
       {
@@ -42,7 +43,7 @@ module.exports = {
         chainId: networks.arbitrumSepolia.chainId,
         urls: {
           apiURL: "https://api-sepolia.arbiscan.io/api",
-          browserURL: "https://arbiscan.io/",
+          browserURL: "https://sepolia.arbiscan.io/",
         },
       },
       {
@@ -50,7 +51,7 @@ module.exports = {
         chainId: networks.baseSepolia.chainId,
         urls: {
           apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://basescan.org/",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
       {
@@ -58,7 +59,7 @@ module.exports = {
         chainId: networks.lineaTestnet.chainId,
         urls: {
           apiURL: "https://api-testnet.lineascan.build/api",
-          browserURL: "https://lineascan.build/",
+          browserURL: "https://goerli.lineascan.build/",
         },
       },
       {
@@ -67,6 +68,14 @@ module.exports = {
         urls: {
           apiURL: "",
           browserURL: "https://explorer.zircuit.com/",
+        },
+      },
+      {
+        network: "injectiveEvmTestnet",
+        chainId: networks.injectiveEvmTestnet.chainId,
+        urls: {
+          apiURL: "",
+          browserURL: "https://testnet.explorer.inevm.com/",
         },
       },
     ],

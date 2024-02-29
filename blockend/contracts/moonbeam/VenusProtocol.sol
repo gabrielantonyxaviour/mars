@@ -10,6 +10,7 @@ contract VenusProtocol {
         COMPLETED,
         FAILED
     }
+
     struct Listing {
         address seller;
         address tokenAddress;
@@ -45,7 +46,7 @@ contract VenusProtocol {
     }
 
     function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice) public {
-        
+        // Wormhole Cross chain queries for fetching approval?
         emit NFTListed(listingIdCounter, msg.sender, tokenAddress, tokenId, nativePrice);
         listingIdCounter++;
     }

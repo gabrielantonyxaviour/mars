@@ -1,0 +1,21 @@
+{
+  "name": "DigitalArt NFT",
+  "description": "A unique digital artwork stored on the blockchain as an NFT.",
+  "image": "https://example.com/image.jpg",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "John Doe"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "1 of 10"
+    },
+    {
+      "trait_type": "Creation Date",
+      "value": "2024-02-29"
+    }
+  ],
+  "external_url": "https://example.com/artwork-details",
+  "background_color": "FFFFFF"
+}
