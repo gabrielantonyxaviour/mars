@@ -1,0 +1,19 @@
+{
+  "name": "drpc-indexer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^5.5.3",
+    "express": "^4.18.3",
+    "mongodb": "^6.3.0",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.1.0"
+  },
+  "scripts": {
+    "dev": "npx nodemon src/index.js",
+    "start" : "node src/index.js"
+  }
+}
