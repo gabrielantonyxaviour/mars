@@ -48,13 +48,13 @@ export default function OriginDropdown({ count }: { count: any }) {
           </button>
           <button
             className={`flex mx-2 mb-2 text-left py-2 px-2 rounded-lg ${
-              origin == "imported" ? "bg-[#d0d1d1] text-black" : "text-white"
+              origin == "external" ? "bg-[#d0d1d1] text-black" : "text-white"
             }`}
             onClick={() => {
-              if (origin == "imported") {
+              if (origin == "external") {
                 setOrigin("");
               } else {
-                setOrigin("imported");
+                setOrigin("external");
               }
             }}
           >
@@ -62,13 +62,13 @@ export default function OriginDropdown({ count }: { count: any }) {
               src={"/block.png"}
               height={35}
               width={35}
-              alt="imported"
+              alt="external"
               className="rounded-lg"
             />
             <p className="flex-1 ml-3 font-semibold  text-lg my-auto">
-              Imported
+              External
             </p>
-            <p className=" text-lg font-semibold my-auto">{count.imported}</p>
+            <p className=" text-lg font-semibold my-auto">{count.external}</p>
           </button>
         </div>
       )}
