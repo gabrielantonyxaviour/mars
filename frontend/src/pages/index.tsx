@@ -1,5 +1,6 @@
 // import Image from "next/image";
 
+import Layout from "@/components/Layout";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -13,5 +14,5 @@ export default function HomePage() {
       openConnectModal && openConnectModal();
   }, [address, connectModalOpen]);
 
-  return <div></div>;
+  return <Layout>{address && <div></div>}</Layout>;
 }
