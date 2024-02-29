@@ -150,12 +150,14 @@ export default function Profile(props: { address: string }) {
               imported: 10,
             }}
             chainCount={{
-              moonbeam: 10,
-              ethereum: 10,
-              polygon: 10,
-              arbitrum: 10,
-              linea: 10,
-              zircuit: 10,
+              1287: 10,
+              11155111: 10,
+              80001: 10,
+              421614: 10,
+              59140: 10,
+              48899: 10,
+              84532: 2,
+              2424: 4,
             }}
           />
         </div>

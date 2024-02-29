@@ -1,13 +1,7 @@
 import Layout from "@/components/Layout";
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { useNetwork } from "wagmi";
-import { useChainModal } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
 export default function Create() {
-  const { openChainModal } = useChainModal();
-  const { chain } = useNetwork();
   const router = useRouter();
 
   return (
@@ -33,7 +27,7 @@ export default function Create() {
                   src="/create/import.png"
                   width={60}
                   height={60}
-                  alt="viction"
+                  alt="import"
                   className="bg-white p-2 rounded-xl"
                 />
                 <p className="text-white font-bold text-2xl mt-4">Import ⬇️</p>
@@ -48,7 +42,7 @@ export default function Create() {
                   src="/create/ai.png"
                   width={100}
                   height={100}
-                  alt="viction"
+                  alt="import"
                   className="bg-white p-2 rounded-xl"
                 />
                 <p className="text-white font-bold text-2xl mt-4">

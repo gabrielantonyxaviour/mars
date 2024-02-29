@@ -40,9 +40,9 @@ export default function ChainDropdown({ count }: { count: any }) {
             count={count.ethereum}
           />
           <ChainComponent
-            chainId="polygon"
+            chainId="80001"
             currentChain={chain}
-            chainName="80001"
+            chainName="Polygon"
             setChain={setChain}
             count={count.polygon}
           />
