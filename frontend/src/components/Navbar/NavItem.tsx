@@ -19,7 +19,7 @@ const NavItem = ({
           ? "flex"
           : content == "Create"
           ? "hidden tablet:flex"
-          : content == "NFTs"
+          : content == "Listings"
           ? "hidden laptop:flex"
           : "hidden desktop:flex"
       }`}

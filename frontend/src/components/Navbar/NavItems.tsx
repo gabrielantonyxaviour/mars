@@ -1,15 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NavItem from "./NavItem";
-import {
-  faCab,
-  faChain,
-  faClover,
-  faCoffee,
-  faHammer,
-  faHeart,
-  faHome,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import useWindowSize from "@/hooks/useWindowSize";
