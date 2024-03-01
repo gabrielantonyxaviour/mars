@@ -19,6 +19,7 @@ import { WalletClient, decodeEventLog, formatUnits } from "viem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { useChainModal } from "@rainbow-me/rainbowkit";
+import ChainDropdown from "@/components/Dropdown/ChainDropdown";
 export default function Import() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -127,6 +128,18 @@ export default function Import() {
               disabled={true}
               className="font-theme ml-2 font-semibold placeholder:text-[#6c6f70] text-xl placeholder:text-base bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 text-white p-2 rounded-xl focus:outline-none  w-full flex-shrink-0 mr-2"
             />
+            {/* <ChooseChainDropdown
+              count={{
+                1287: 10,
+                11155111: 10,
+                80001: 10,
+                421614: 10,
+                59140: 10,
+                48899: 10,
+                84532: 2,
+                2424: 4,
+              }}
+            /> */}
             <div className="flex justify-between">
               <div>
                 <p className="text-white text-xl font-semibold ml-4  mt-6">
