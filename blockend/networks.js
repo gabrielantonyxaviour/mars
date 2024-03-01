@@ -27,7 +27,7 @@ const networks = {
     wormholeChainId: "16",
     wormholeCore: "0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901",
     wormholeRelayer: "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
-    protocol: "0x09F1aF4e16728fcF340051055159F0f9D5e00b54",
+    protocol: "0x9Fa2f0872498f56Fec437d92D66842f162c6B922",
   },
   ethereumSepolia: {
     url: "https://ethereum-sepolia-rpc.publicnode.com",
@@ -40,7 +40,7 @@ const networks = {
     nativeCurrencySymbol: "ETH",
     wormholeChainId: "10002",
     wormholeRelayer: "0x7B1bD7a6b4E61c2a123AC6BC2cbfC614437D0470",
-    connector: "0x6055973A4b7fA6A69B52A1A881667076f977df07",
+    connector: "0xBe7F03168C672227bC12293445e1C109cF918538",
   },
   polygonMumbai: {
     url: "https://polygon-mumbai-pokt.nodies.app",
