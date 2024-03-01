@@ -4,6 +4,8 @@ pragma solidity ^0.8.12;
 import "../wormhole/QueryResponse.sol";
 import "../interfaces/IWormholeRelayer.sol";
 import "../interfaces/IWormholeReceiver.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 
 error NotOwner(address sender);
 error InCorrectPrice(uint256 pricePaid, uint256 priceRequired);
@@ -201,5 +203,11 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
             receiverValue,
             GAS_LIMIT
         );
+    }
+
+    // Called by Wormhole Cross chain query to verify NFT setup for listing
+    function getAllowed(address tokenAddress, uint256 tokenId, address caller) public view returns(bool)
+    {
+        return IERC721(tokenAddress).ownerOf(tokenId) == caller && IERC721(tokenAddress).getApproved(tokenId) == address(this);
     }
 }

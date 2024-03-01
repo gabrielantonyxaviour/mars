@@ -67,5 +67,9 @@ contract VenusConnector is IWormholeReceiver{
         );
     }
 
- 
+    // Called by Wormhole Cross chain query to verify NFT setup for listing
+    function getAllowed(address tokenAddress, uint256 tokenId, address caller) public view returns(bool)
+    {
+        return IERC721(tokenAddress).ownerOf(tokenId) == caller && IERC721(tokenAddress).getApproved(tokenId) == address(this);
+    }
 }
