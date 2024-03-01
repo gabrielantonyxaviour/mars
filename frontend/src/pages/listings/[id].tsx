@@ -21,7 +21,7 @@ import useWindowSize from "@/hooks/useWindowSize";
 import { explorers } from "@/utils/constants";
 import { shortenEthereumAddress } from "@/utils";
 
-export default function Relation() {
+export default function Listing() {
   const router = useRouter();
   const { address } = useAccount();
   const { id } = router.query;
