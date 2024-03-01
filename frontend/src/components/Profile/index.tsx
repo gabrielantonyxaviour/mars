@@ -5,12 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-// import NFTCard from "./NFTCard";
 // import getNftsByOwner from "@/utils/supabase/get-nfts-by-owner";
 // import resolveRarity from "@/utils/resolveRarity";
 // import getRelationshipsByCreator from "@/utils/supabase/get-relationships-by-creator";
 // import RelationshipCard from "./RelationshipCard";
 import { useNetwork } from "wagmi";
+import NFTCard from "../NFTCard";
 // import getNft from "@/utils/supabase/get-nft";
 // import TreeCard from "./TreeCard";
 
@@ -161,25 +161,21 @@ export default function Profile(props: { address: string }) {
             }}
           />
         </div>
-        {/* <div>
+        <div>
           <div className={`grid grid-cols-5 gap-3 mx-8`}>
-            {selected == 0 &&
-              ownedNfts.length > 0 &&
-              ownedNfts.map((nft: any) => {
-                return (
-                  <NFTCard
-                    image={nft.image}
-                    imageAlt={nft.image_alt}
-                    owner={nft.parent}
-                    address={nft.contract_address}
-                    rarity={resolveRarity(nft.rarity)}
-                    tokenId={nft.token_id}
-                    mode={nft.type == 0 ? "create ✨" : "breed ❤️"}
-                    size={300}
-                  />
-                );
-              })}
-            {selected == 1 &&
+            {selected == 0 && (
+              <NFTCard
+                image={
+                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
+                }
+                tokenAddress={"0x123"}
+                tokenId={"1"}
+                chainId={"1287"}
+                mode={"create ✨"}
+                size={300}
+              />
+            )}
+            {/* {selected == 1 &&
               relationships &&
               relationships.length > 0 &&
               relationships.map((rel: any) => {
@@ -214,9 +210,9 @@ export default function Profile(props: { address: string }) {
                     nft2={rel.parent2.image}
                   />
                 );
-              })}
+              })} */}
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   );

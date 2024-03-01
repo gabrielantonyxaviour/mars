@@ -1,6 +1,6 @@
 import Dropdown from "@/components/Dropdown";
 import Layout from "@/components/Layout";
-import NFTCard from "@/components/NFTCard";
+import ListingCard from "@/components/ListingCard";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
@@ -74,7 +74,7 @@ export default function ListingPage() {
                   : "grid-cols-5 desktop:grid-cols-6"
               } gap-3 mx-8`}
             >
-              <NFTCard
+              <ListingCard
                 key={1}
                 image={
                   "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
@@ -87,7 +87,7 @@ export default function ListingPage() {
                 mode={"create 🪄"}
                 size={300}
               />
-              <NFTCard
+              <ListingCard
                 key={2}
                 image={
                   "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
