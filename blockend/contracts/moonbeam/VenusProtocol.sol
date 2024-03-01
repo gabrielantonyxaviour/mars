@@ -72,6 +72,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     event NftPurchaseCompleted(uint256 orderId);
     event NftPurchaseFailed(uint256 orderId);
     event CrossChainQueryLogger(ParsedQueryResponse r, EthCallQueryResponse eqr, address owner);
+    event ClaimablesClaimed(address receiver, uint256 amount);
 
     constructor(address _wormholeCoreAddress, address _wormholeRelayer) QueryResponse(_wormholeCoreAddress)  {
         owner=msg.sender;
@@ -184,6 +185,14 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
             emit NftPurchaseFailed(orderId);
         }
     }
+
+    function claimClaimables(address receivingAddress) public {
+        uint256 claimableValue=claimables[receivingAddress];
+        claimables[receivingAddress]=0;
+        payable(receivingAddress).transfer(claimableValue);
+        emit ClaimablesClaimed(receivingAddress, claimableValue);
+    }
+
 
 
     function quoteCrossChainCall(

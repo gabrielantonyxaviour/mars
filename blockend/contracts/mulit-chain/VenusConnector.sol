@@ -25,6 +25,8 @@ contract VenusConnector is IWormholeReceiver{
         protocolWormholeChainId = _protocolWormholeChainId;
     }
     
+    event ConfirmationRelayed(uint256 orderId, bool isAllowed);
+
     function receiveWormholeMessages(
         bytes memory payload,
         bytes[] memory, // additionalVaas
@@ -52,6 +54,7 @@ contract VenusConnector is IWormholeReceiver{
             0, // no receiver value needed since we're just passing a message
             GAS_LIMIT
         );
+        emit ConfirmationRelayed(orderId, isAllowed);
     }
 
     function quoteCrossChainCall(
@@ -64,4 +67,5 @@ contract VenusConnector is IWormholeReceiver{
         );
     }
 
+ 
 }
