@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const contractABI = require("./data/abi.json");
 const { ethers } = require("ethers");
 require("dotenv").config();
@@ -16,8 +19,6 @@ app.use(morgan("common"));
 const api = require("./routes/api");
 app.use("/api", api);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 /* DRPC Providers Starts */
 const etherumSepoliaProvider = new ethers.providers.JsonRpcProvider(
