@@ -105,7 +105,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
         uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue);
         
-        if(msg.value >= listings[listingId].priceInNative+cost) revert InCorrectPrice(msg.value, listings[listingId].priceInNative+cost);
+        if(msg.value < listings[listingId].priceInNative+cost) revert InCorrectPrice(msg.value, listings[listingId].priceInNative+cost);
         if(!listings[listingId].isActive) revert NotActive(listingId);
         if(whitelistedWormholeAddresses[wormholeChainId] == address(0)) revert NotWhiteListedChain(wormholeChainId);
         
