@@ -56,7 +56,7 @@ contract VenusProtocol is QueryResponse {
 
     function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice, bytes memory response, IWormhole.Signature[] memory signatures) public {
         // Wormhole Cross chain queries for fetching approval?
-        require(verifyApprovalCrossChainQuery(response, signatures), "Approval not verified");
+        // require(verifyApprovalCrossChainQuery(response, signatures), "Approval not verified");
         emit NFTListed(listingIdCounter, msg.sender, tokenAddress, tokenId, nativePrice);
         listingIdCounter++;
     }
@@ -74,15 +74,18 @@ contract VenusProtocol is QueryResponse {
         return orderIdCounter;
     }
 
-    function getListingIdCounter() public view returns(uint256){
+    function getListingIdCounte() public view returns(uint256){
         return listingIdCounter;
     }
-
-    function verifyApprovalCrossChainQuery(bytes memory response, IWormhole.Signature[] memory signatures) public view returns(bool){
+    event Logger(ParsedQueryResponse r, EthCallQueryResponse eqr, address owner);
+    function verifyApprovalCrossChainQuery(bytes memory response, bytes32 rSig, bytes32 sSig, uint8 vSig, uint8 guardianIndexSig) public  returns(bool){
+        IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
+        signatures[0] = IWormhole.Signature(rSig, sSig, vSig, guardianIndexSig);
         ParsedQueryResponse memory r = parseAndVerifyQueryResponse(response, signatures);
         EthCallQueryResponse memory eqr = parseEthCallQueryResponse(r.responses[0]);
         address owner=abi.decode(eqr.result[0].result, (address));
+
+        emit Logger(r, eqr, owner);
         return owner == msg.sender;
     }
-
 }
