@@ -46,7 +46,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint8 guardianIndex;
     }
 
-    uint256 public constant GAS_LIMIT = 50_000;
+    uint256 public constant GAS_LIMIT = 200_000;
     mapping(uint256 => Listing) public listings;
     mapping(uint256 => Order) public orders;
     mapping(uint16 => address) public whitelistedWormholeAddresses;

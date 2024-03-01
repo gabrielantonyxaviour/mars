@@ -11,7 +11,7 @@ contract VenusConnector is IWormholeReceiver{
     bytes32 public immutable protocolAddress;
     uint16 public immutable protocolWormholeChainId;
 
-    uint256 public constant GAS_LIMIT = 100_000;
+    uint256 public constant GAS_LIMIT = 200_000;
 
 
     constructor (address _wormholeRelayer, address _protocolAddress, uint16 _protocolWormholeChainId, string memory _protocolAxelarChainName) {
