@@ -19,6 +19,7 @@ contract VenusProtocol is QueryResponse {
         uint256 wormholeChainId;
         uint256 priceInNative;
         bytes signature;
+        bool isActive;
     }
 
     struct Order {
