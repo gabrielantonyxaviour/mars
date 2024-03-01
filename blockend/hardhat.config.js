@@ -34,8 +34,6 @@ module.exports = {
       arbitrumSepolia: networks.arbitrumSepolia.verifyApiKey,
       baseSepolia: networks.baseSepolia.verifyApiKey,
       lineaTestnet: networks.lineaTestnet.verifyApiKey,
-      zircuitTestnet: networks.zircuitTestnet.verifyApiKey,
-      injectiveEvmTestnet: networks.injectiveEvmTestnet.verifyApiKey,
     },
     customChains: [
       {
@@ -60,22 +58,6 @@ module.exports = {
         urls: {
           apiURL: "https://api-testnet.lineascan.build/api",
           browserURL: "https://goerli.lineascan.build/",
-        },
-      },
-      {
-        network: "zircuitTestnet",
-        chainId: networks.zircuitTestnet.chainId,
-        urls: {
-          apiURL: "",
-          browserURL: "https://explorer.zircuit.com/",
-        },
-      },
-      {
-        network: "injectiveEvmTestnet",
-        chainId: networks.injectiveEvmTestnet.chainId,
-        urls: {
-          apiURL: "",
-          browserURL: "https://testnet.explorer.inevm.com/",
         },
       },
     ],

@@ -13,11 +13,15 @@ task("deploy-protocol", "Deploys the VenusProtocol contract")
     console.log("\n__Compiling Contracts__");
     await run("compile");
 
+    const wormhoelCore = networks[network.name].wormholeCore;
+    const wormholeRelayer = networks[network.name].wormholeRelayer;
+
     const protocolContractFactory = await ethers.getContractFactory(
       "VenusProtocol"
     );
     const protocolContract = await protocolContractFactory.deploy(
-      "0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901"
+      wormhoelCore,
+      wormholeRelayer
     );
 
     console.log(
@@ -52,7 +56,7 @@ task("deploy-protocol", "Deploys the VenusProtocol contract")
         console.log("\nVerifying contract...");
         await run("verify:verify", {
           address: protocolContract.address,
-          constructorArguments: ["0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901"],
+          constructorArguments: [wormhoelCore, wormholeRelayer],
         });
         console.log("Contract verified");
       } catch (error) {
