@@ -53,8 +53,9 @@ contract VenusProtocol is QueryResponse {
         return 0;
     }
 
-    function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice) public {
+    function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice, bytes memory response, IWormhole.Signature[] memory signatures) public {
         // Wormhole Cross chain queries for fetching approval?
+        require(verifyApprovalCrossChainQuery(response, signatures), "Approval not verified");
         emit NFTListed(listingIdCounter, msg.sender, tokenAddress, tokenId, nativePrice);
         listingIdCounter++;
     }
@@ -76,5 +77,11 @@ contract VenusProtocol is QueryResponse {
         return listingIdCounter;
     }
 
+    function verifyApprovalCrossChainQuery(bytes memory response, IWormhole.Signature[] memory signatures) public view returns(bool){
+        ParsedQueryResponse memory r = parseAndVerifyQueryResponse(response, signatures);
+        EthCallQueryResponse memory eqr = parseEthCallQueryResponse(r.responses[0]);
+        address owner=abi.decode(eqr.result[0].result, (address));
+        return owner == msg.sender;
+    }
 
 }
