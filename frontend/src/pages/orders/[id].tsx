@@ -20,6 +20,7 @@ import {
 import useWindowSize from "@/hooks/useWindowSize";
 import { explorers } from "@/utils/constants";
 import { shortenEthereumAddress } from "@/utils";
+import TransactionStatusOrder from "@/components/TransactionStatus/TransactionStatusOrder";
 
 export default function Order() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function Order() {
         <Confetti width={width} height={height} />
       )}
 
-      <div className="min-h-[90vh] mt-20 w-[80%] mx-auto flex justify-between">
+      <div className="mt-20 mb-8 w-[80%] mx-auto flex justify-between">
         <div className="flex justify-between w-full">
           <div className="flex flex-col">
             <NFTCard
@@ -175,6 +176,11 @@ export default function Order() {
           </div>
         </div>
       </div>
+      <TransactionStatusOrder
+        sourceTransactionHash="0x307d6f2269c7e5df6a5b5aa8347e0fb7cdac5f72084e698201584b441702a308"
+        destinationChainId="2424"
+        transactionConfirmed={true}
+      />
     </Layout>
   );
 }
