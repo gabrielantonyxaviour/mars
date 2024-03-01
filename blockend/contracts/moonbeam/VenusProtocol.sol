@@ -5,6 +5,14 @@ import "../wormhole/QueryResponse.sol";
 import "../interfaces/IWormholeRelayer.sol";
 import "../interfaces/IWormholeReceiver.sol";
 
+error NotOwner(address sender);
+error InCorrectPrice(uint256 pricePaid, uint256 priceRequired);
+error NotActive(uint256 listingId);
+error NotWhiteListedChain(uint16 chainId);
+error NotWhiteListedAddress(address sender);
+error NotRelayer(address sender);
+
+
 contract VenusProtocol is QueryResponse, IWormholeReceiver {
 
     enum OrderStatus {
@@ -74,7 +82,8 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
 
     modifier onlyOwner()
     {
-        require(msg.sender==owner, "Only owner allowed");    
+
+       if(msg.sender != owner) revert NotOwner(msg.sender);   
         _;
     }
 
@@ -96,12 +105,11 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
         uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue);
         
-        require(msg.value >= listings[listingId].priceInNative+cost, "Incorrect price paid"); // check correct price paid
-        require(listings[listingId].isActive, "Listing does not exist or inactive"); // check if listing is active or exists
-        require(whitelistedWormholeAddresses[wormholeChainId] != address(0), "Wormhole address not whitelisted"); // check if whitelisted wormhole address exists
+        if(msg.value >= listings[listingId].priceInNative+cost) revert InCorrectPrice(msg.value, listings[listingId].priceInNative+cost);
+        if(!listings[listingId].isActive) revert NotActive(listingId);
+        if(whitelistedWormholeAddresses[wormholeChainId] == address(0)) revert NotWhiteListedChain(wormholeChainId);
         
         orders[orderIdCounter]=Order(orderIdCounter, listingId, listings[listingId].chainId, msg.sender, Relayer.WORMHOLE, OrderStatus.PENDING);
-        
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             wormholeChainId,
             whitelistedWormholeAddresses[wormholeChainId],
@@ -111,7 +119,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
             wormholeChainId,
             owner
         );
-        
+        listings[listingId].isActive = false;
         emit NftPurchaseInitiated(orderIdCounter, listingId, wormholeChainId, msg.sender, msg.value);
         
         orderIdCounter++;
@@ -158,9 +166,9 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint16 sourceChain,
         bytes32 // unique identifier of delivery
     ) public payable override {
-        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
+        if(msg.sender != address(wormholeRelayer))revert NotRelayer(msg.sender);
         address sourceAddress=address(uint160(uint256(sourceAddressBytes32)));
-        require(whitelistedWormholeAddresses[sourceChain] == sourceAddress, "Address not whitelisted");
+        if(whitelistedWormholeAddresses[sourceChain] != sourceAddress) revert NotWhiteListedAddress(sourceAddress);
         // Parse the payload and do the corresponding actions!
         (uint256 orderId, bool success) = abi.decode(
             payload,

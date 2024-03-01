@@ -5,6 +5,11 @@ import "../interfaces/IWormholeRelayer.sol";
 import "../interfaces/IWormholeReceiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+error NotRelayer(address sender);
+error NotProtocol(address sender);
+error NotCorrectChain(uint16 chain);
+error InSufficientFee(uint256 fee);
+
 contract VenusConnector is IWormholeReceiver{
 
     IWormholeRelayer public immutable wormholeRelayer;
@@ -27,10 +32,11 @@ contract VenusConnector is IWormholeReceiver{
         uint16 sourceChain,
         bytes32 // unique identifier of delivery
     ) public payable override {
-        require(msg.sender == address(wormholeRelayer), "Only relayer allowed");
-        require(protocolAddress == sourceAddress, "Address not allowed");
-        require(sourceChain == protocolWormholeChainId, "Chain not allowed");
-        require(msg.value>=quoteCrossChainCall(sourceChain, 0), "Insufficient cross chain fee");
+        if(msg.sender != address(wormholeRelayer))revert NotRelayer(msg.sender);
+        if(sourceAddress != protocolAddress) revert NotProtocol(msg.sender);
+        if(sourceChain != protocolWormholeChainId) revert NotCorrectChain(sourceChain);
+        if(msg.value < quoteCrossChainCall(sourceChain, 0)) revert InSufficientFee(msg.value);
+        
         (uint256 orderId, address tokenAddress, uint256 tokenId, address buyer, address seller) = abi.decode(
             payload,
             (uint256, address, uint256, address, address)
