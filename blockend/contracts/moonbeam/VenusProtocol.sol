@@ -19,12 +19,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         AXELAR
     }
 
-    enum CrossChainResponse{
-        SUCCESS,
-        NOT_APPROVED, 
-        NOT_OWNED
-    }
-
     struct Listing {
         address seller;
         address tokenAddress;
@@ -68,7 +62,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     event NFTListed(uint256 listingId, address seller, address tokenAddress, uint256 tokenId, uint256 chainId, uint256 validity, uint256 priceInNative);
     event NftPurchaseInitiated(uint256 orderId, uint256 foreignChainListingId, uint256 wormholeChainId, address buyer, uint256 pricePaidInNative);
     event NftPurchaseCompleted(uint256 orderId);
-    event NftPurchaseFailed(uint256 orderId, uint8 returnValue);
+    event NftPurchaseFailed(uint256 orderId);
     event CrossChainQueryLogger(ParsedQueryResponse r, EthCallQueryResponse eqr, address owner);
 
     constructor(address _wormholeCoreAddress, address _wormholeRelayer) QueryResponse(_wormholeCoreAddress)  {
@@ -168,18 +162,18 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         address sourceAddress=address(uint160(uint256(sourceAddressBytes32)));
         require(whitelistedWormholeAddresses[sourceChain] == sourceAddress, "Address not whitelisted");
         // Parse the payload and do the corresponding actions!
-        (uint256 orderId, uint8 returnValue) = abi.decode(
+        (uint256 orderId, bool success) = abi.decode(
             payload,
-            (uint256, uint8)
+            (uint256, bool)
         );
-        if(returnValue==0){
+        if(success){
             orders[orderId].status = OrderStatus.COMPLETED;
             claimables[listings[orders[orderId].listingId].seller] += listings[orders[orderId].listingId].priceInNative;
             emit NftPurchaseCompleted(orderId);
         }else{
             orders[orderId].status = OrderStatus.FAILED;
             claimables[orders[orderId].buyer] += listings[orders[orderId].listingId].priceInNative;
-            emit NftPurchaseFailed(orderId, returnValue);
+            emit NftPurchaseFailed(orderId);
         }
     }
 
