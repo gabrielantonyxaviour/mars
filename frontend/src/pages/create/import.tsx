@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import ChainDropdown from "@/components/Dropdown/ChainDropdown";
+import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
 export default function Import() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -33,9 +34,10 @@ export default function Import() {
   const [progress, setProgress] = useState(0);
   const [imageAlt, setImageAlt] = useState("");
   const [approveSignature, setApproveSignature] = useState<`0x${string}`>();
-  const [txHash, setTxHash] = useState<`0x${string}`>();
+  const [txHash, setTxHash] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
+  const [destinationChainId, setDestinationChainId] = useState("1287");
 
   const { openChainModal } = useChainModal();
 
@@ -224,27 +226,14 @@ export default function Import() {
                 </div>
               )}
             </div>
-            {txHash != null && txHash.length != 0 && (
-              <div className="text-center mt-2">
-                <p>Tx Hash</p>
-                <a
-                  className="text-sm text-[#9c9e9e] "
-                  href={"https://moonbase.moonscan.io/tx/" + txHash}
-                  target={"_blank"}
-                >
-                  {txHash.substring(0, 10) +
-                    "...." +
-                    txHash.substring(txHash.length - 10)}
-                  <FontAwesomeIcon
-                    icon={faArrowUpRightFromSquare}
-                    className="ml-2"
-                  />
-                </a>
-              </div>
-            )}
           </div>
         </div>
       </div>
+      <TransactionStatusCreate
+        destinationChainId={destinationChainId}
+        sourceTransactionHash={txHash as string}
+        transactionConfirmed={false}
+      />
     </Layout>
   );
 }

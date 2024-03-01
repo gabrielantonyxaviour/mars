@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import GenerateButton from "@/components/GenerateButton";
+import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
 export default function Generate() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -33,6 +34,7 @@ export default function Generate() {
   const [fetchTime, setFetchTime] = useState(0);
   const [txHash, setTxHash] = useState<string>("");
   const { openChainModal } = useChainModal();
+  const [destinationChainId, setDestinationChainId] = useState("1287");
 
   useEffect(() => {
     console.log("WE ARE HERE");
@@ -282,6 +284,11 @@ export default function Generate() {
           </div>
         </div>
       </div>
+      <TransactionStatusCreate
+        destinationChainId={destinationChainId}
+        sourceTransactionHash={txHash as string}
+        transactionConfirmed={false}
+      />
     </Layout>
   );
 }
