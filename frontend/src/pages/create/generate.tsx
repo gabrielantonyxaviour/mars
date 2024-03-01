@@ -263,24 +263,6 @@ export default function Generate() {
                 )
               )}
             </div>
-            {txHash.length != 0 && (
-              <div className="text-center mt-2">
-                <p>Tx Hash</p>
-                <a
-                  className="text-sm text-[#9c9e9e] "
-                  href={"https://moonbase.moonscan.io/tx/" + txHash}
-                  target={"_blank"}
-                >
-                  {txHash.substring(0, 10) +
-                    "...." +
-                    txHash.substring(txHash.length - 10)}
-                  <FontAwesomeIcon
-                    icon={faArrowUpRightFromSquare}
-                    className="ml-2"
-                  />
-                </a>
-              </div>
-            )}
           </div>
         </div>
       </div>
