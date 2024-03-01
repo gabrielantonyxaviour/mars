@@ -14,5 +14,5 @@ export default function HomePage() {
       openConnectModal && openConnectModal();
   }, [address, connectModalOpen]);
 
-  return <Layout>{address && <div></div>}</Layout>;
+  return <Layout>{address && <div className="h-screen"></div>}</Layout>;
 }
