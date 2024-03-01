@@ -21,6 +21,7 @@ import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import GenerateButton from "@/components/GenerateButton";
 import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
+import ChooseChainDropdown from "@/components/Dropdown/ChooseChainDropdown";
 export default function Generate() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -34,7 +35,15 @@ export default function Generate() {
   const [fetchTime, setFetchTime] = useState(0);
   const [txHash, setTxHash] = useState<string>("");
   const { openChainModal } = useChainModal();
-  const [destinationChainId, setDestinationChainId] = useState("1287");
+  const [selectedChain, setSelectedChain] = useState("1287");
+  const [chains, setChains] = useState([
+    "1287",
+    "80001",
+    "11155111",
+    "59140",
+    "84532",
+    "421614",
+  ]);
 
   useEffect(() => {
     console.log("WE ARE HERE");
@@ -60,7 +69,7 @@ export default function Generate() {
   }
   return (
     <Layout>
-      <div className="flex justify-center h-[90vh] items-center ">
+      <div className="flex justify-center h-[100vh] items-center ">
         {count == 4 && <Confetti width={width} height={height} />}
         <div className="flex">
           <div className=" flex flex-col justify-start">
@@ -98,9 +107,7 @@ export default function Generate() {
                 </button>
               )}
             </div>
-            <p className="text-white text-xl font-semibold ml-4 mb-2 mt-3">
-              Prompt
-            </p>
+            <p className="text-white text-xl font-semibold ml-4 mb-2">Prompt</p>
             <input
               type="text"
               placeholder={"Ex. CryptoPunk that looks like Drake"}
@@ -110,9 +117,18 @@ export default function Generate() {
               }}
               className="font-theme ml-2 font-semibold placeholder:text-[#6c6f70] text-xl placeholder:text-base bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 text-white p-2 rounded-xl focus:outline-none  w-full flex-shrink-0 mr-2"
             />
+
+            <p className="text-white text-xl font-semibold ml-4 mb-2 mt-4">
+              Choose Chain
+            </p>
+            <ChooseChainDropdown
+              options={chains}
+              setOption={setSelectedChain}
+              selectedOption={selectedChain}
+            />
             <div className="flex justify-between">
               <div>
-                <p className="text-white text-xl font-semibold ml-4  mt-6">
+                <p className="text-white text-xl font-semibold ml-4  mt-2">
                   Confirmation
                 </p>
                 <p className="ml-4 mb-2 text-[#9c9e9e] font-semibold text-sm">
@@ -267,7 +283,7 @@ export default function Generate() {
         </div>
       </div>
       <TransactionStatusCreate
-        destinationChainId={destinationChainId}
+        destinationChainId={selectedChain}
         sourceTransactionHash={txHash as string}
         transactionConfirmed={false}
       />

@@ -193,8 +193,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         emit ClaimablesClaimed(receivingAddress, claimableValue);
     }
 
-
-
     function quoteCrossChainCall(
         uint16 targetChain, uint256 receiverValue
     ) public view returns (uint256 cost) {

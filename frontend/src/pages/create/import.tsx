@@ -21,6 +21,7 @@ import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import ChainDropdown from "@/components/Dropdown/ChainDropdown";
 import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
+import ChooseChainDropdown from "@/components/Dropdown/ChooseChainDropdown";
 export default function Import() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -37,7 +38,15 @@ export default function Import() {
   const [txHash, setTxHash] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
-  const [destinationChainId, setDestinationChainId] = useState("1287");
+  const [selectedChain, setSelectedChain] = useState("1287");
+  const [chains, setChains] = useState([
+    "1287",
+    "80001",
+    "11155111",
+    "59140",
+    "84532",
+    "421614",
+  ]);
 
   const { openChainModal } = useChainModal();
 
@@ -120,28 +129,15 @@ export default function Import() {
                 </button>
               )}
             </div>
-            <p className="text-white text-xl font-semibold ml-4 mb-2 mt-3">
-              Import
+
+            <p className="text-white text-xl font-semibold ml-4 mb-2 mt-4">
+              Choose Chain
             </p>
-            <input
-              type="text"
-              placeholder={"Click on the box to upload your NFT"}
-              value={prompt}
-              disabled={true}
-              className="font-theme ml-2 font-semibold placeholder:text-[#6c6f70] text-xl placeholder:text-base bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 text-white p-2 rounded-xl focus:outline-none  w-full flex-shrink-0 mr-2"
+            <ChooseChainDropdown
+              options={chains}
+              setOption={setSelectedChain}
+              selectedOption={selectedChain}
             />
-            {/* <ChooseChainDropdown
-              count={{
-                1287: 10,
-                11155111: 10,
-                80001: 10,
-                421614: 10,
-                59140: 10,
-                48899: 10,
-                84532: 2,
-                2424: 4,
-              }}
-            /> */}
             <div className="flex justify-between">
               <div>
                 <p className="text-white text-xl font-semibold ml-4  mt-6">
@@ -209,7 +205,10 @@ export default function Import() {
                     document.getElementById("imageInput")?.click();
                   }}
                 >
-                  <p className="font-semibold text-xl mb-4">Upload your NFT</p>
+                  <p className="font-bold text-2xl mb-1">Upload your NFT</p>
+                  <p className="text-sm text-[#a9a9a9] mb-4">
+                    Click here to import from your device
+                  </p>
                   <Image
                     src={"/create/import.png"}
                     width={50}
@@ -230,7 +229,7 @@ export default function Import() {
         </div>
       </div>
       <TransactionStatusCreate
-        destinationChainId={destinationChainId}
+        destinationChainId={selectedChain}
         sourceTransactionHash={txHash as string}
         transactionConfirmed={false}
       />
