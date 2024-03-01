@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
+import "../wormhole/QueryResponse.sol";
 
-contract VenusProtocol {
+contract VenusProtocol is QueryResponse {
 
     enum OrderStatus {
         DOES_NOT_EXIST,
@@ -29,6 +30,7 @@ contract VenusProtocol {
         OrderStatus status;
     }
 
+
     mapping(uint256 => Listing) public listings;
     mapping(uint256 => Order) public orders;
     uint256 public orderIdCounter;
@@ -38,6 +40,12 @@ contract VenusProtocol {
     event NftPurchaseInitiated(uint256 orderId, uint256 foreignChainListingId, uint256 wormholeChainId, address buyer, uint256 pricePaidInNative);
     event NftPurchaseCompleted(uint256 orderId, address seller);
     event NftPurchaseFailed(uint256 orderId);
+
+
+    constructor(address _wormhole) QueryResponse(_wormhole) {
+        orderIdCounter = 0;
+        listingIdCounter = 0;
+    }
 
     function purchaseNFT(uint256 listingId, uint256 wormholeChainId) public payable  returns(uint256 orderId){
         emit NftPurchaseInitiated(orderIdCounter, listingId, wormholeChainId, msg.sender, msg.value);

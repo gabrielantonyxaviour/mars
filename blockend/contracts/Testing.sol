@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./interface/IWormhole.sol";
+import "./interfaces/IWormhole.sol";
 
 contract Testing {
     mapping(address => string) public lastMessage;
