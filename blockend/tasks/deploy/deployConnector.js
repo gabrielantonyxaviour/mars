@@ -13,10 +13,19 @@ task("deploy-connector", "Deploys the VenusConnector contract")
     console.log("\n__Compiling Contracts__");
     await run("compile");
 
+    const relayer = networks[network.name].wormholeRelayer;
+    const protocolAddress = networks.moonbaseAlpha.protocol;
+    const protocolWormholeChainId = networks.moonbaseAlpha.wormholeChainId;
+    const protcolAxelarAddress = "moonbeam-axelar";
     const connectorContractFactory = await ethers.getContractFactory(
       "VenusConnector"
     );
-    const connectorContract = await connectorContractFactory.deploy();
+    const connectorContract = await connectorContractFactory.deploy(
+      relayer,
+      protocolAddress,
+      protocolWormholeChainId,
+      protcolAxelarAddress
+    );
 
     console.log(
       `\nWaiting ${
@@ -50,7 +59,12 @@ task("deploy-connector", "Deploys the VenusConnector contract")
         console.log("\nVerifying contract...");
         await run("verify:verify", {
           address: connectorContract.address,
-          constructorArguments: [],
+          constructorArguments: [
+            relayer,
+            protocolAddress,
+            protocolWormholeChainId,
+            protcolAxelarAddress,
+          ],
         });
         console.log("Contract verified");
       } catch (error) {
