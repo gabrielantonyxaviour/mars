@@ -17,7 +17,7 @@ export default async function handler(
   const rpc = "https://ethereum-sepolia-rpc.publicnode.com";
   const callData: EthCallData = {
     to: "0x9A369955B26f5E9BEcc6339e5661dB675B318B00", // WETH
-    data: "0x6352211e0000000000000000000000000000000000000000000000000000000000000000", // web3.eth.abi.encodeFunctionSignature("totalSupply()")
+    data: "0x6352211e0000000000000000000000000000000000000000000000000000000000000000", // web3.eth.abi.encodeFunctionSignature("ownerOf(uint256)")
   };
 
   const latestBlock: string = (
