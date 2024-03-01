@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 // import RelationshipCard from "./RelationshipCard";
 import { useNetwork } from "wagmi";
 import NFTCard from "../NFTCard";
+import ListingCard from "../ListingCard";
+import OrderCard from "../OrderCard";
 // import getNft from "@/utils/supabase/get-nft";
 // import TreeCard from "./TreeCard";
 
@@ -175,42 +177,33 @@ export default function Profile(props: { address: string }) {
                 size={300}
               />
             )}
-            {/* {selected == 1 &&
-              relationships &&
-              relationships.length > 0 &&
-              relationships.map((rel: any) => {
-                return (
-                  <RelationshipCard
-                    nft1={{
-                      image: rel.parent1.image,
-                      rarity: rel.parent1.rarity,
-                      mode: rel.parent1.type == 0 ? "create ✨" : "breed ❤️",
-                      tokenId: rel.parent1.token_id,
-                    }}
-                    nft2={{
-                      image: rel.parent2.image,
-                      rarity: rel.parent2.rarity,
-                      mode: rel.parent2.type == 0 ? "create ✨" : "breed ❤️",
-                      tokenId: rel.parent2.token_id,
-                    }}
-                    relationship={rel.relationship}
-                  />
-                );
-              })}
-            {selected == 2 &&
-              relationships &&
-              relationships.length > 0 &&
-              relationships.map((rel: any) => {
-                return (
-                  <TreeCard
-                    nft1={rel.parent1.image}
-                    family="Bored Ape"
-                    race="BAYC/PUNK"
-                    count="1"
-                    nft2={rel.parent2.image}
-                  />
-                );
-              })} */}
+            {selected == 1 && (
+              <ListingCard
+                image={
+                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
+                }
+                listingId={"3"}
+                chainId={"2424"}
+                createdAt="2024-02-28 15:45:36.180961+00"
+                validity={900000}
+                price="21"
+                mode={"create 🪄"}
+                size={300}
+              />
+            )}
+            {selected == 2 && (
+              <OrderCard
+                image={
+                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
+                }
+                orderId={"3"}
+                chainId={"2424"}
+                createdAt="2024-02-28 15:45:36.180961+00"
+                status={"PENDING"}
+                mode={"create 🪄"}
+                size={300}
+              />
+            )}
           </div>
         </div>
       </div>
