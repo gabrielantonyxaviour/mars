@@ -18,6 +18,7 @@ import {
   polygonMumbai,
   sepolia,
 } from "viem/chains";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const config = getDefaultConfig({
   appName: "Venus Marketplace",
@@ -26,22 +27,31 @@ const config = getDefaultConfig({
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 export default function App({ Component, pageProps }: AppProps) {
+  const [ready, setReady] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setReady(true);
+  }, []);
+  const queryClient = new QueryClient();
+
   return (
     <WagmiProvider config={config}>
-      <RainbowKitProvider
-        initialChain={moonbaseAlpha}
-        showRecentTransactions={true}
-        theme={darkTheme({
-          accentColor: "#00A0BD",
-          accentColorForeground: "white",
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          initialChain={moonbaseAlpha}
+          showRecentTransactions={true}
+          theme={darkTheme({
+            accentColor: "#00A0BD",
+            accentColorForeground: "white",
 
-          borderRadius: "large",
-          fontStack: "rounded",
-          overlayBlur: "small",
-        })}
-      >
-        <Component {...pageProps} />
-      </RainbowKitProvider>
+            borderRadius: "large",
+            fontStack: "rounded",
+            overlayBlur: "small",
+          })}
+        >
+          <Component {...pageProps} />
+        </RainbowKitProvider>
+      </QueryClientProvider>
     </WagmiProvider>
   );
 }
