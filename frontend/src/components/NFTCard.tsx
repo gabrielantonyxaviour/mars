@@ -46,16 +46,22 @@ export default function NFTCard({
   });
 
   useEffect(() => {
-    console.log(tokenId);
     (async function () {
-      console.log("NFTCard");
-
-      const resTokenUri = await contract.read.tokenURI([2]);
-      console.log(resTokenUri);
-      const metadata = await fetch(resTokenUri as string);
-      const metadataJson = await metadata.json();
-      const _image = metadataJson.image;
-      setImage(_image);
+      try {
+        console.log("NFTCard");
+        console.log(tokenId);
+        console.log(chainId);
+        const resTokenUri = await contract.read.tokenURI([tokenId]);
+        console.log(resTokenUri);
+        const metadata = await fetch(resTokenUri as string);
+        const metadataJson = await metadata.json();
+        const _image = metadataJson.image;
+        setImage(_image);
+      } catch (e) {
+        setImage(
+          "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmPbFa12vQjYiy9E1G7SQskVvFNgyxcJnwiMjHSNABWzYk"
+        );
+      }
     })();
   }, []);
 

@@ -129,9 +129,6 @@ export default function Listing() {
         <div className="flex justify-between w-full">
           <div className="flex flex-col">
             <NFTCard
-              image={
-                "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
-              }
               tokenAddress={"0x123"}
               tokenId={"1"}
               chainId={"80001"}

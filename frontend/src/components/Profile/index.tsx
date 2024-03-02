@@ -5,71 +5,38 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-// import getNftsByOwner from "@/utils/supabase/get-nfts-by-owner";
-// import resolveRarity from "@/utils/resolveRarity";
-// import getRelationshipsByCreator from "@/utils/supabase/get-relationships-by-creator";
-// import RelationshipCard from "./RelationshipCard";
 import { useAccount } from "wagmi";
 import NFTCard from "../NFTCard";
 import ListingCard from "../ListingCard";
 import OrderCard from "../OrderCard";
-// import getNft from "@/utils/supabase/get-nft";
-// import TreeCard from "./TreeCard";
+import axios from "axios";
 
 export default function Profile(props: { address: string }) {
   const { address } = props;
   const { chain } = useAccount();
   const [selected, setSelected] = useState(0);
   const [ownedNfts, setOwnedNfts] = useState([]);
-  const [relationships, setRelationships] = useState([]);
-  // const [familyTrees, setFamilyTrees] = useState([]);
-  // const [powerups, setPowerups] = useState([]);
 
-  const sampleProfile = {
-    wallet: address,
-    name: "Bob",
-    image: "https://picsum.photos/500/500",
-    cover: "https://picsum.photos/800/300",
-    description: "Hey there! I'm new to ZexCraft!",
-  };
-
-  //   useEffect(() => {}, []);
-
-  //   useEffect(() => {
-  //     (async function () {
-  //       console.log(chain?.id);
-  //       const nfts = await getNftsByOwner({
-  //         address: address,
-  //         chainId: (chain?.id as number).toString(),
-  //       });
-  //       console.log(nfts.response);
-  //       setOwnedNfts(nfts.response as any);
-  //     })();
-  //     console.log("Owned NFTs");
-  //     console.log(ownedNfts);
-
-  //     (async function () {
-  //       let rels = await getRelationshipsByCreator({
-  //         chainId: (chain?.id as number).toString(),
-  //         actual_parent: address,
-  //       });
-  //       if (rels.response != null) {
-  //         for (let i = 0; i < rels.response.length; i++) {
-  //           const parent1 = await getNft({
-  //             address: rels.response[i].parent1,
-  //             chainId: (chain?.id as number).toString(),
-  //           });
-  //           const parent2 = await getNft({
-  //             address: rels.response[i].parent2,
-  //             chainId: (chain?.id as number).toString(),
-  //           });
-  //           rels.response[i].parent1 = parent1.response;
-  //           rels.response[i].parent2 = parent2.response;
-  //         }
-  //         setRelationships(rels.response as any);
-  //       }
-  //     })();
-  //   }, [address]);
+  useEffect(() => {
+    (async function () {
+      console.log("FETCHING NFTS");
+      console.log(address);
+      const nfts = await axios.post(
+        "/api/drpc/get-nfts-by-owner",
+        JSON.stringify({
+          owner: address,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(nfts.data.data);
+      setOwnedNfts(nfts.data.data);
+    })();
+    console.log(address);
+  }, [address]);
   return (
     <div className="flex flex-col justify-start min-h-[90vh]  ">
       <Image
@@ -165,18 +132,18 @@ export default function Profile(props: { address: string }) {
         </div>
         <div>
           <div className={`grid grid-cols-5 gap-3 mx-8`}>
-            {selected == 0 && (
-              <NFTCard
-                image={
-                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
-                }
-                tokenAddress={"0x620b89DeE45a3Fb1675182B8AD538B656b3D8366"}
-                tokenId={"2"}
-                chainId={"1287"}
-                mode={"create ✨"}
-                size={300}
-              />
-            )}
+            {selected == 0 &&
+              ownedNfts != undefined &&
+              ownedNfts.length > 0 &&
+              ownedNfts.map((ownedNft: any) => (
+                <NFTCard
+                  tokenAddress={ownedNft.address}
+                  tokenId={ownedNft.tokenId}
+                  chainId={ownedNft.chainId}
+                  mode={ownedNft.internal ? "create 🪄" : "external 🌐"}
+                  size={300}
+                />
+              ))}
             {selected == 1 && (
               <ListingCard
                 image={

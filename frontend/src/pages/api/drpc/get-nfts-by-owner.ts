@@ -5,8 +5,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { owner } = JSON.parse(req.body);
-
+  console.log(req.body);
+  const { owner } = req.body;
+  console.log("\n=====================");
+  console.log(owner);
   const response = await fetch(`${DRPC_BASE_URL}/api/nfts/${owner}`, {
     method: "GET",
     headers: {
