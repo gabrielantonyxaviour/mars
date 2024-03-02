@@ -170,8 +170,8 @@ export default function Profile(props: { address: string }) {
                 image={
                   "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
                 }
-                tokenAddress={"0x123"}
-                tokenId={"1"}
+                tokenAddress={"0x620b89DeE45a3Fb1675182B8AD538B656b3D8366"}
+                tokenId={"2"}
                 chainId={"1287"}
                 mode={"create ✨"}
                 size={300}

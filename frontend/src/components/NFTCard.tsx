@@ -22,38 +22,41 @@ function resolveChain(chainId: string) {
   else return arbitrumSepolia;
 }
 export default function NFTCard({
-  image,
   chainId,
   tokenAddress,
   tokenId,
   mode,
   size,
 }: {
-  image: string;
   tokenAddress: string;
   tokenId: string;
   chainId: string;
   mode: string;
   size: number;
 }) {
+  const [image, setImage] = useState("");
   const publicClient = createPublicClient({
     chain: resolveChain(chainId),
     transport: http(),
   });
   const contract = getContract({
-    address: "0x620b89DeE45a3Fb1675182B8AD538B656b3D8366" as `0x${string}`,
+    address: tokenAddress as `0x${string}`,
     abi: nftContractAbi,
     client: publicClient,
   });
 
   useEffect(() => {
     console.log(tokenId);
-    // (async function () {
-    //   const resOwnerOf = await contract.read.ownerOf([2]);
-    //   console.log(resOwnerOf);
-    //   const resTokenUri = await contract.read.tokenURI([2]);
-    //   console.log(resTokenUri);
-    // })();
+    (async function () {
+      console.log("NFTCard");
+
+      const resTokenUri = await contract.read.tokenURI([2]);
+      console.log(resTokenUri);
+      const metadata = await fetch(resTokenUri as string);
+      const metadataJson = await metadata.json();
+      const _image = metadataJson.image;
+      setImage(_image);
+    })();
   }, []);
 
   return (
