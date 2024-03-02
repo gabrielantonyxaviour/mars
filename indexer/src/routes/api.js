@@ -445,7 +445,7 @@ router.get("/listing/:listingID", async (req, res) => {
       },
       {
         $project: {
-          address: '$args.tokenAddress',
+          address: "$args.tokenAddress",
           tokenId: "$args.tokenId",
           seller: "$args.seller",
           chainId: 1,
@@ -491,6 +491,9 @@ router.get("/nft/:tokenAddress/:tokenId", async (req, res) => {
           owner: "$args.to",
           chainId: 1,
           network: 1,
+          internal: {
+            $in: [{ $toLower: "$args.tokenAddress" }, nftMode.internal],
+          },
         },
       },
     ])
