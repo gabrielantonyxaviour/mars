@@ -22,14 +22,9 @@ import axios from "axios";
 
 export default function Nft() {
   const router = useRouter();
-  const { address } = useAccount();
   const { id } = router.query;
   const { width, height } = useWindowSize();
   const [txHash, setTxHash] = useState("");
-  const [pairBred, setPairBred] = useState("");
-  const [tokenAddress, setTokenAddress] = useState("");
-  const [tokenId, setTokenId] = useState("");
-  const [chainId, setChainId] = useState("");
   const [price, setPrice] = useState(0);
   const [nft, setNft] = useState<any>(null);
   const { writeContractAsync: listNft } = useWriteContract();
@@ -38,8 +33,6 @@ export default function Nft() {
     (async function getNft() {
       if (id != undefined) {
         const [_tokenAddress, _tokenId] = id.toString().split("-");
-        setTokenAddress(_tokenAddress);
-        setTokenId(_tokenId);
         const nftRes = await axios.post(
           "/api/drpc/get-nft-details",
           { tokenAddress: _tokenAddress, tokenId: _tokenId },
@@ -56,9 +49,7 @@ export default function Nft() {
   }, [id]);
   return (
     <Layout>
-      {txHash != "" && pairBred != "" && (
-        <Confetti width={width} height={height} />
-      )}
+      {txHash != "" && <Confetti width={width} height={height} />}
 
       {nft != null && (
         <div className="min-h-[90vh] mt-20 w-[80%] mx-auto flex justify-between">
@@ -149,45 +140,41 @@ export default function Nft() {
                 <div className="w-[30%] flex flex-col justify-end mb-2">
                   <button
                     onClick={async () => {
-                      const res = await fetch("/api/wormhole/query", {
-                        method: "POST",
-                      });
-                      const resData = await res.json();
-                      console.log([
-                        "0x" + resData.data.bytes,
-                        resData.struct[0].r,
-                        resData.struct[0].s,
-                        resData.struct[0].v,
-                        resData.struct[0].guardianIndex,
-                      ]);
+                      try {
+                        const res = await fetch("/api/wormhole/query", {
+                          method: "POST",
+                        });
+                        const resData = await res.json();
+                        console.log([
+                          "0x" + resData.data.bytes,
+                          resData.struct[0].r,
+                          resData.struct[0].s,
+                          resData.struct[0].v,
+                          resData.struct[0].guardianIndex,
+                        ]);
 
-                      await listNft({
-                        address: protocolAddress as `0x${string}`,
-                        abi: venusProtocolAbi,
-                        functionName: "listNft",
-                        args: [
-                          tokenAddress,
-                          tokenId,
-                          price,
-                          300000,
-                          chainId,
-                          [
-                            "0x" + resData.data.bytes,
-                            resData.struct[0].r,
-                            resData.struct[0].s,
-                            resData.struct[0].v,
-                            resData.struct[0].guardianIndex,
+                        await listNft({
+                          address: protocolAddress as `0x${string}`,
+                          abi: venusProtocolAbi,
+                          functionName: "listNft",
+                          args: [
+                            nft.address,
+                            nft.tokenId,
+                            price,
+                            300000,
+                            nft.chainId,
+                            [
+                              "0x" + resData.data.bytes,
+                              resData.struct[0].r,
+                              resData.struct[0].s,
+                              resData.struct[0].v,
+                              resData.struct[0].guardianIndex,
+                            ],
                           ],
-                        ],
-                      });
-                      //   args: [
-                      //     "0x" + resData.data.bytes,
-                      //     resData.struct[0].r,
-                      //     resData.struct[0].s,
-                      //     resData.struct[0].v,
-                      //     resData.struct[0].guardianIndex,
-                      //   ],
-                      // });
+                        });
+                      } catch (e) {
+                        console.log(e);
+                      }
                     }}
                     className={`${
                       false
