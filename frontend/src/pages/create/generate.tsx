@@ -39,6 +39,7 @@ export default function Generate() {
   const [chooseImage, setChooseImage] = useState("");
   const [fetchTime, setFetchTime] = useState(0);
   const [txHash, setTxHash] = useState<string>("");
+  const [transactionConfirmed, setTransactionConfirmed] = useState(false);
   const { openChainModal } = useChainModal();
   const [selectedChain, setSelectedChain] = useState("1287");
   const [mintFee, setMintFee] = useState<bigint>(BigInt(0));
@@ -46,7 +47,6 @@ export default function Generate() {
     "1287",
     "80001",
     "11155111",
-    "59140",
     "84532",
     "421614",
   ]);
@@ -157,7 +157,7 @@ export default function Generate() {
                   Confirmation
                 </p>
                 <p className="ml-4 mb-2 text-[#9c9e9e] font-semibold text-sm">
-                  Mint Fee: 5 &nbsp;GLMR
+                  Mint Fee: {formatUnits(mintFee, 18)} &nbsp;GLMR
                 </p>
               </div>
             </div>
@@ -240,6 +240,7 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        setTransactionConfirmed={setTransactionConfirmed}
                         publicClient={publicClient}
                         mintFee={mintFee}
                         selectedChain={selectedChain}
@@ -252,6 +253,7 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        setTransactionConfirmed={setTransactionConfirmed}
                         publicClient={publicClient}
                         mintFee={mintFee}
                         selectedChain={selectedChain}
@@ -264,6 +266,7 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        setTransactionConfirmed={setTransactionConfirmed}
                         publicClient={publicClient}
                         mintFee={mintFee}
                         selectedChain={selectedChain}
@@ -276,6 +279,7 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        setTransactionConfirmed={setTransactionConfirmed}
                         publicClient={publicClient}
                         mintFee={mintFee}
                         selectedChain={selectedChain}
@@ -322,7 +326,7 @@ export default function Generate() {
       <TransactionStatusCreate
         destinationChainId={selectedChain}
         sourceTransactionHash={txHash as string}
-        transactionConfirmed={false}
+        transactionConfirmed={transactionConfirmed}
       />
     </Layout>
   );

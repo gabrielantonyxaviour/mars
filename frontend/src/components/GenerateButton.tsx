@@ -14,6 +14,7 @@ export default function GenerateButton({
   messageId,
   mintFee,
   selectedChain,
+  setTransactionConfirmed,
   publicClient,
   setFetchTime,
   index,
@@ -22,6 +23,7 @@ export default function GenerateButton({
 }: {
   setCount: React.Dispatch<React.SetStateAction<number>>;
   setMessageId: React.Dispatch<React.SetStateAction<string>>;
+  setTransactionConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
   messageId: string;
   publicClient: any;
   mintFee: bigint;
@@ -88,9 +90,11 @@ export default function GenerateButton({
           onLogs: async (logs: any) => {
             console.log("Logged!");
             setCount(4);
-            setMessageId("");
+            setTransactionConfirmed(true);
           },
         });
+        setMessageId("");
+
         const tx = await mintNft({
           address: venusMoonbaseNftAddress,
           abi: venusMoonbaseNftAbi,
