@@ -12,7 +12,7 @@ error NotRelayer(address sender);
 error NotMinter(address sender);
 error NotCorrectChain(uint16 chain);
 
-contract VenusCrosschainNFT is IWormholeReceiver, ERC721, ERC721URIStorage{
+contract VenusCrosschainNft is IWormholeReceiver, ERC721, ERC721URIStorage{
     uint256 private _nextTokenId;
 
     IWormholeRelayer public immutable wormholeRelayer;

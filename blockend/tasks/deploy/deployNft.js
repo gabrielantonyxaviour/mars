@@ -1,6 +1,6 @@
 const { networks } = require("../../networks");
 
-task("deploy-sample-nft", "Deploys the NFT contract")
+task("deploy-nft", "Deploys the NFT contract")
   .addOptionalParam(
     "verify",
     "Set to true to verify contract",
@@ -14,10 +14,8 @@ task("deploy-sample-nft", "Deploys the NFT contract")
     console.log("\n__Compiling Contracts__");
     await run("compile");
 
-    const initalOwner = "0x0429A2Da7884CA14E53142988D5845952fE4DF6a";
-
     const sampleNftFactory = await ethers.getContractFactory("NFT_A");
-    const sampleNft = await sampleNftFactory.deploy(initalOwner);
+    const sampleNft = await sampleNftFactory.deploy();
 
     console.log(
       `\nWaiting ${
@@ -48,7 +46,7 @@ task("deploy-sample-nft", "Deploys the NFT contract")
         console.log("\nVerifying contract...");
         await run("verify:verify", {
           address: sampleNft.address,
-          constructorArguments: [initalOwner],
+          constructorArguments: [],
         });
         console.log("Contract verified");
       } catch (error) {

@@ -17,6 +17,10 @@ contract NFT_C is ERC721, ERC721URIStorage {
         _setTokenURI(tokenId, uri);
     }
 
+    function getTokenId() public view returns(uint256) {
+        return _nextTokenId;
+    }
+
     // The following functions are overrides required by Solidity.
 
     function tokenURI(uint256 tokenId)
