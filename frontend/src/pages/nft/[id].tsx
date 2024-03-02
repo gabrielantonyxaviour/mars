@@ -22,6 +22,7 @@ import axios from "axios";
 
 export default function Nft() {
   const router = useRouter();
+  const { address } = useAccount();
   const { id } = router.query;
   const { width, height } = useWindowSize();
   const [txHash, setTxHash] = useState("");
@@ -62,6 +63,24 @@ export default function Nft() {
                 mode={"create ✨"}
                 size={300}
               />
+              {txHash != "" && (
+                <div className="text-center mt-2">
+                  <p>Tx Hash</p>
+                  <a
+                    className="text-sm text-[#9c9e9e] "
+                    href={"https://" + explorers["1287"] + "/tx/" + txHash}
+                    target={"_blank"}
+                  >
+                    {txHash.substring(0, 10) +
+                      "...." +
+                      txHash.substring(txHash.length - 10)}
+                    <FontAwesomeIcon
+                      icon={faArrowUpRightFromSquare}
+                      className="ml-2"
+                    />
+                  </a>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-1 flex-col  mx-24">
@@ -120,72 +139,75 @@ export default function Nft() {
                   </div>
                 </div>
               </div>
-              <div className="flex mt-8 flex justify-between space-x-4">
-                <div className="">
-                  <p className="font-semibold text-2xl mb-6">List NFT</p>
-                  <p className="text-md font-semibold">Price</p>
-                  <div className="flex">
-                    {" "}
-                    <input
-                      type="number"
-                      value={price}
-                      onChange={(e) => {
-                        setPrice(parseInt(e.target.value));
+              {address == nft.owner && (
+                <div className="flex mt-8 flex justify-between space-x-4">
+                  <div className="">
+                    <p className="font-semibold text-2xl mb-6">List NFT</p>
+                    <p className="text-md font-semibold">Price</p>
+                    <div className="flex">
+                      {" "}
+                      <input
+                        type="number"
+                        value={price}
+                        onChange={(e) => {
+                          setPrice(parseInt(e.target.value));
+                        }}
+                        className="font-theme w-[50%] font-semibold placeholder:text-[#6c6f70] text-xl placeholder:text-base bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 text-white p-2 rounded-xl focus:outline-none   flex-shrink-0 mr-2"
+                      />
+                      <p className="text-xl font-semibold my-auto ml-2">GLMR</p>
+                    </div>
+                  </div>
+                  <div className="w-[30%] flex flex-col justify-end mb-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch("/api/wormhole/query", {
+                            method: "POST",
+                          });
+                          const resData = await res.json();
+                          console.log([
+                            "0x" + resData.data.bytes,
+                            resData.struct[0].r,
+                            resData.struct[0].s,
+                            resData.struct[0].v,
+                            resData.struct[0].guardianIndex,
+                          ]);
+
+                          const tx = await listNft({
+                            address: protocolAddress as `0x${string}`,
+                            abi: venusProtocolAbi,
+                            functionName: "listNft",
+                            args: [
+                              nft.address,
+                              nft.tokenId,
+                              price,
+                              300000,
+                              nft.chainId,
+                              [
+                                "0x" + resData.data.bytes,
+                                resData.struct[0].r,
+                                resData.struct[0].s,
+                                resData.struct[0].v,
+                                resData.struct[0].guardianIndex,
+                              ],
+                            ],
+                          });
+                          setTxHash(tx);
+                        } catch (e) {
+                          console.log(e);
+                        }
                       }}
-                      className="font-theme w-[50%] font-semibold placeholder:text-[#6c6f70] text-xl placeholder:text-base bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 text-white p-2 rounded-xl focus:outline-none   flex-shrink-0 mr-2"
-                    />
-                    <p className="text-xl font-semibold my-auto ml-2">GLMR</p>
+                      className={`${
+                        false
+                          ? "bg-[#25272b] text-[#5b5e5b]"
+                          : "bg-white text-black"
+                      } px-4 py-2 rounded-xl font-semibold `}
+                    >
+                      List NFT
+                    </button>
                   </div>
                 </div>
-                <div className="w-[30%] flex flex-col justify-end mb-2">
-                  <button
-                    onClick={async () => {
-                      try {
-                        const res = await fetch("/api/wormhole/query", {
-                          method: "POST",
-                        });
-                        const resData = await res.json();
-                        console.log([
-                          "0x" + resData.data.bytes,
-                          resData.struct[0].r,
-                          resData.struct[0].s,
-                          resData.struct[0].v,
-                          resData.struct[0].guardianIndex,
-                        ]);
-
-                        await listNft({
-                          address: protocolAddress as `0x${string}`,
-                          abi: venusProtocolAbi,
-                          functionName: "listNft",
-                          args: [
-                            nft.address,
-                            nft.tokenId,
-                            price,
-                            300000,
-                            nft.chainId,
-                            [
-                              "0x" + resData.data.bytes,
-                              resData.struct[0].r,
-                              resData.struct[0].s,
-                              resData.struct[0].v,
-                              resData.struct[0].guardianIndex,
-                            ],
-                          ],
-                        });
-                      } catch (e) {
-                        console.log(e);
-                      }
-                    }}
-                    className={`${
-                      false
-                        ? "bg-[#25272b] text-[#5b5e5b]"
-                        : "bg-white text-black"
-                    } px-4 py-2 rounded-xl font-semibold `}
-                  >
-                    List NFT
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
