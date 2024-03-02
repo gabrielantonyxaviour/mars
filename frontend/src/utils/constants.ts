@@ -8,6 +8,14 @@ export const chains: { [key: string]: string } = {
   "421614": "Arbitrum Sepolia",
 };
 
+export const wormholeChainIds: { [key: string]: string } = {
+  "80001": "5",
+  "1287": "16",
+  "11155111": "10002",
+  "84532": "10004",
+  "421614": "10003",
+};
+
 export const explorers: { [key: string]: string } = {
   "80001": "mumbai.polygonscan.com",
   "1287": "moonbase.moonscan.io",
@@ -16,7 +24,7 @@ export const explorers: { [key: string]: string } = {
   "421614": "sepolia.arbiscan.io",
 };
 
-export const venusMoonbaseNftAddress: string =
+export const venusMoonbaseNftAddress: `0x${string}` =
   "0x620b89DeE45a3Fb1675182B8AD538B656b3D8366";
 
 export const venusCrosschainMintAddresses: { [key: string]: string } = {

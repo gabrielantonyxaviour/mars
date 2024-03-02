@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { file } = JSON.parse(req.body);
+    const { file } = req.body;
     const imageBuffer = Buffer.from(file, "base64");
 
     const formData = new FormData();

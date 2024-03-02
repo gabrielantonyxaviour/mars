@@ -5,11 +5,6 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const connectorABI = require("./data/connector.abi.json");
-const nftABI = require("./data/nft.abi.json");
-const venusABI = require("./data/venus.abi.json");
-const venusNFTABI = require("./data/venusNFT.abi.json");
-const { ethers } = require("ethers");
 require("dotenv").config();
 
 const { MongoClient } = require("mongodb");
@@ -22,225 +17,490 @@ app.use(morgan("common"));
 const api = require("./routes/api");
 app.use("/api", api);
 
-/* DRPC Providers Starts */
-const etherumSepoliaProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=sepolia&dkey=${process.env.DRPC_API_KEY}`
-);
-const ethereumSepoliaConnector = process.env.ETHERUM_SEPOLIA_CONNECTOR;
-const ethereumSepoliaNFT = process.env.ETHERUM_SEPOLIA_NFT;
-const polygonMumbaiProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=polygon-mumbai&dkey=${process.env.DRPC_API_KEY}`
-);
-const polygonMumbaiConnector = process.env.POLYGON_MUMBAI_CONNECTOR;
-const polygonMumbaiNFT = process.env.POLYGON_MUMBAI_NFT;
-const baseSepoliaProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=base-sepolia&dkey=${process.env.DRPC_API_KEY}`
-);
-const baseSepoliaConnector = process.env.BASE_SEPOLIA_CONNECTOR;
-const baseSepoliaNFT = process.env.BASE_SEPOLIA_NFT;
-const arbitrumSepoliaProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=arbitrum-sepolia&dkey=${process.env.DRPC_API_KEY}`
-);
-const arbitrumSepoliaConnector = process.env.ARBITRUM_SEPOLIA_CONNECTOR;
-const arbitrumSepoliaNFT = process.env.ARBITRUM_SEPOLIA_NFT;
-const moonbeamAlphaProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=moonbase-alpha&dkey=${process.env.DRPC_API_KEY}`
-);
-const venusProtocol = process.env.VENUS_PROTOCOL;
-const venusNFT = process.env.VENUS_NFT;
-/* DRPC Providers Ends */
+/* Viem Implementation */
+const { createPublicClient, http, parseAbi } = require("viem");
+const connectorABI = require("./data/connector.abi.json");
+const nftABI = require("./data/nft.abi.json");
+const venusABI = require("./data/venus.abi.json");
+const venusNFTABI = require("./data/venusNFT.abi.json");
 
-const ethereumSepoliaConnectorInstance = new ethers.Contract(
-  ethereumSepoliaConnector,
-  connectorABI,
-  etherumSepoliaProvider
-);
-const polygonMumbaiConnectorInstance = new ethers.Contract(
-  polygonMumbaiConnector,
-  connectorABI,
-  polygonMumbaiProvider
-);
-const baseSepoliaConnectorInstance = new ethers.Contract(
-  baseSepoliaConnector,
-  connectorABI,
-  baseSepoliaProvider
-);
-const arbitrumSepoliaConnectorInstance = new ethers.Contract(
-  arbitrumSepoliaConnector,
-  connectorABI,
-  arbitrumSepoliaProvider
-);
-
-const ethereumSepoliaNFTInstance = new ethers.Contract(
-  ethereumSepoliaNFT,
-  nftABI,
-  etherumSepoliaProvider
-);
-const polygonMumbaiNFTInstance = new ethers.Contract(
-  polygonMumbaiNFT,
-  nftABI,
-  polygonMumbaiProvider
-);
-const baseSepoliaNFTInstance = new ethers.Contract(
-  baseSepoliaNFT,
-  nftABI,
-  baseSepoliaProvider
-);
-const arbitrumSepoliaNFTInstance = new ethers.Contract(
-  arbitrumSepoliaNFT,
-  nftABI,
-  arbitrumSepoliaProvider
-);
-
-const venusProtocolInstance = new ethers.Contract(
-  venusProtocol,
-  venusABI,
-  moonbeamAlphaProvider
-);
-const venusNFTInstance = new ethers.Contract(
-  venusNFT,
-  venusNFTABI,
-  moonbeamAlphaProvider
-);
-
-ethereumSepoliaConnectorInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "ethereum-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Ethereum Sepolia:", data);
+const mumbaiClient = createPublicClient({
+  transport: http(
+    `https://lb.drpc.org/ogrpc?network=polygon-mumbai&dkey=${process.env.DRPC_API_KEY}`
+  ),
 });
+let mumbaiContracts = [
+  {
+    address: process.env.POLYGON_MUMBAI_CONNECTOR,
+    abi: connectorABI,
+    block: process.env.POLYGON_MUMBAI_CONNECTOR_BLOCK,
+  },
+  {
+    address: process.env.POLYGON_MUMBAI_NFT,
+    abi: nftABI,
+    block: process.env.POLYGON_MUMBAI_NFT_BLOCK,
+  },
+  {
+    address: process.env.POLYGON_MUMBAI_CROSSCHAIN_NFT,
+    abi: nftABI,
+    block: process.env.POLYGON_MUMBAI_CROSSCHAIN_NFT_BLOCK,
+  },
+];
 
-polygonMumbaiConnectorInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "polygon-mumbai",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Polygon Mumbai:", data);
+const sepoliaClient = createPublicClient({
+  transport: http(
+    `https://lb.drpc.org/ogrpc?network=sepolia&dkey=${process.env.DRPC_API_KEY}`
+  ),
 });
+let sepoliaContracts = [
+  {
+    address: process.env.ETHERUM_SEPOLIA_CONNECTOR,
+    abi: connectorABI,
+    block: process.env.ETHERUM_SEPOLIA_CONNECTOR_BLOCK,
+  },
+  {
+    address: process.env.ETHERUM_SEPOLIA_NFT,
+    abi: nftABI,
+    block: process.env.ETHERUM_SEPOLIA_NFT_BLOCK,
+  },
+  {
+    address: process.env.ETHERUM_SEPOLIA_CROSSCHAIN_NFT,
+    abi: nftABI,
+    block: process.env.ETHERUM_SEPOLIA_CROSSCHAIN_NFT_BLOCK,
+  },
+];
 
-baseSepoliaConnectorInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "base-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Base Sepolia:", data);
+const baseSepoliaClient = createPublicClient({
+  transport: http(
+    `https://lb.drpc.org/ogrpc?network=base-sepolia&dkey=${process.env.DRPC_API_KEY}`
+  ),
 });
+let baseSepoliaContracts = [
+  {
+    address: process.env.BASE_SEPOLIA_CONNECTOR,
+    abi: connectorABI,
+    block: process.env.BASE_SEPOLIA_CONNECTOR_BLOCK,
+  },
+  {
+    address: process.env.BASE_SEPOLIA_NFT,
+    abi: nftABI,
+    block: process.env.BASE_SEPOLIA_NFT_BLOCK,
+  },
+  {
+    address: process.env.BASE_SEPOLIA_CROSSCHAIN_NFT,
+    abi: nftABI,
+    block: process.env.BASE_SEPOLIA_CROSSCHAIN_NFT_BLOCK,
+  },
+];
 
-arbitrumSepoliaConnectorInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "arbitrum-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Arbitrum Sepolia:", data);
+const arbitrumSepoliaClient = createPublicClient({
+  transport: http(
+    `https://lb.drpc.org/ogrpc?network=arbitrum-sepolia&dkey=${process.env.DRPC_API_KEY}`
+  ),
 });
+let arbitrumSepoliaContracts = [
+  {
+    address: process.env.ARBITRUM_SEPOLIA_CONNECTOR,
+    abi: connectorABI,
+    block: process.env.ARBITRUM_SEPOLIA_CONNECTOR_BLOCK,
+  },
+  {
+    address: process.env.ARBITRUM_SEPOLIA_NFT,
+    abi: nftABI,
+    block: process.env.ARBITRUM_SEPOLIA_NFT_BLOCK,
+  },
+  {
+    address: process.env.ARBITRUM_SEPOLIA_CROSSCHAIN_NFT,
+    abi: nftABI,
+    block: process.env.ARBITRUM_SEPOLIA_CROSSCHAIN_NFT_BLOCK,
+  },
+];
 
-ethereumSepoliaNFTInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "ethereum-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Ethereum Sepolia NFT:", data);
+const moonbeamAlphaClient = createPublicClient({
+  transport: http(
+    `https://lb.drpc.org/ogrpc?network=moonbase-alpha&dkey=${process.env.DRPC_API_KEY}`
+  ),
 });
+let moonbeamAlphaContracts = [
+  {
+    address: process.env.VENUS_PROTOCOL,
+    abi: venusABI,
+    block: process.env.VENUS_PROTOCOL_BLOCK,
+  },
+  {
+    address: process.env.VENUS_NFT,
+    abi: venusNFTABI,
+    block: process.env.VENUS_NFT_BLOCK,
+  },
+  {
+    address: process.env.MOONBASE_NFT,
+    abi: nftABI,
+    block: process.env.MOONBASE_NFT_BLOCK,
+  },
+];
 
-polygonMumbaiNFTInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "polygon-mumbai",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Polygon Mumbai NFT:", data);
-});
+function convertSolidityAbiToHumanReadable(abi) {
+  try {
+    let abiHumanReadable = [];
+    abi.map((item) => {
+      if (item.type === "event") {
+        const indexedParams = item.inputs
+          .map(
+            (param) =>
+              `${param.type} ${param.indexed ? "indexed " : ""}${param.name}`
+          )
+          .join(", ");
+        abiHumanReadable.push(`${item.type} ${item.name}(${indexedParams})`);
+      }
+    });
 
-baseSepoliaNFTInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "base-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Base Sepolia NFT:", data);
-});
+    return abiHumanReadable;
+  } catch (error) {
+    console.error(
+      "Error converting Solidity ABI to human-readable ABI:",
+      error.message
+    );
+    return null;
+  }
+}
 
-arbitrumSepoliaNFTInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "arbitrum-sepolia",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Arbitrum Sepolia NFT:", data);
-});
+// async function scrapeMumabiData() {
+//   const latest = await mumbaiClient.getBlockNumber();
+//   // let maximumBlock = BigInt(700);
+//   for (let i = 0; i < mumbaiContracts.length; i++) {
+//     console.log({
+//       address: mumbaiContracts[i].address,
+//       from: BigInt(mumbaiContracts[i].block),
+//       to: latest,
+//     });
+//     const contract = mumbaiContracts[i];
+//     const logs = await mumbaiClient.getLogs({
+//       address: contract.address,
+//       events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+//       fromBlock: BigInt(contract.block),
+//       toBlock: latest,
+//     });
+//     for (let j = 0; j < logs.length; j++) {
+//       const log = logs[j];
+//       const data = {
+//         ...log,
+//         timestamp: Date.now(),
+//         network: "polygon-mumbai",
+//       };
+//       await db.collection("events").insertOne(data);
+//     }
+//   }
 
-venusProtocolInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "moonbeam-alpha",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Venus Protocol:", data);
-});
+//   // let currentStartBlock = BigInt(mumbaiContracts.connectorBlock);
+// }
 
-venusNFTInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "moonbeam-alpha",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Venus NFT:", data);
-});
+async function scrapeMumabiData() {
+  for (let i = 0; i < mumbaiContracts.length; i++) {
+    const contract = mumbaiContracts[i];
+    const latestBlock = await mumbaiClient.getBlockNumber();
 
-const ethereumSepoliaContractAddress = {
-  connector: ethereumSepoliaConnector,
-  nft: ethereumSepoliaNFT,
-};
+    // Calculate the initial range for the first 700 blocks
+    let startBlock = parseInt(contract.block, 10);
+    let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
-const polygonMumbaiContractAddress = {
-  connector: polygonMumbaiConnector,
-  nft: polygonMumbaiNFT,
-};
+    while (startBlock <= latestBlock) {
+      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      const logs = await mumbaiClient.getLogs({
+        address: contract.address,
+        events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+        fromBlock: BigInt(startBlock),
+        toBlock: BigInt(endBlock),
+      });
 
-const baseSepoliaContractAddress = {
-  connector: baseSepoliaConnector,
-  nft: baseSepoliaNFT,
-};
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "polygon-mumbai",
+        };
+        await db.collection("events").insertOne(data);
+      }
 
-const arbitrumSepoliaContractAddress = {
-  connector: arbitrumSepoliaConnector,
-  nft: arbitrumSepoliaNFT,
-};
+      // Move to the next range of 700 blocks
+      startBlock = endBlock + 1;
+      endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+    }
 
-const moonbeamAlphaContractAddress = {
-  protocol: venusProtocol,
-  nft: venusNFT,
-};
+    contract.block = endBlock;
+  }
+}
 
+async function scrapeSepoliaData() {
+  for (let i = 0; i < sepoliaContracts.length; i++) {
+    const contract = sepoliaContracts[i];
+    const latestBlock = await sepoliaClient.getBlockNumber();
 
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      ethereumSepoliaContractAddress,
-      polygonMumbaiContractAddress,
-      baseSepoliaContractAddress,
-      arbitrumSepoliaContractAddress,
-      moonbeamAlphaContractAddress,
+    // Calculate the initial range for the first 700 blocks
+    let startBlock = parseInt(contract.block, 10);
+    let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+
+    while (startBlock <= latestBlock) {
+      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+
+      const logs = await sepoliaClient.getLogs({
+        address: contract.address,
+        events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+        fromBlock: BigInt(startBlock),
+        toBlock: BigInt(endBlock),
+      });
+
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "ethereum-sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+
+      // Move to the next range of 700 blocks
+      startBlock = endBlock + 1;
+      endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+    }
+
+    contract.block = endBlock;
+  }
+}
+
+async function scrapeBaseSepoliaData() {
+  for (let i = 0; i < baseSepoliaContracts.length; i++) {
+    const contract = baseSepoliaContracts[i];
+    const latestBlock = await baseSepoliaClient.getBlockNumber();
+
+    // Calculate the initial range for the first 700 blocks
+    let startBlock = parseInt(contract.block, 10);
+    let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+
+    while (startBlock <= latestBlock) {
+      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+
+      const logs = await baseSepoliaClient.getLogs({
+        address: contract.address,
+        events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+        fromBlock: BigInt(startBlock),
+        toBlock: BigInt(endBlock),
+      });
+
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "base-sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+
+      // Move to the next range of 700 blocks
+      startBlock = endBlock + 1;
+      endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+    }
+
+    contract.block = endBlock;
+  }
+}
+
+async function scrapeArbitrumSepoliaData() {
+  for (let i = 0; i < arbitrumSepoliaContracts.length; i++) {
+    const contract = arbitrumSepoliaContracts[i];
+    const latestBlock = await arbitrumSepoliaClient.getBlockNumber();
+
+    // Calculate the initial range for the first 700 blocks
+    let startBlock = parseInt(contract.block, 10);
+    let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+
+    while (startBlock <= latestBlock) {
+      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+
+      const logs = await arbitrumSepoliaClient.getLogs({
+        address: contract.address,
+        events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+        fromBlock: BigInt(startBlock),
+        toBlock: BigInt(endBlock),
+      });
+
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "arbitrum-sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+
+      // Move to the next range of 700 blocks
+      startBlock = endBlock + 1;
+      endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+    }
+
+    contract.block = endBlock;
+  }
+}
+
+async function scrapeMoonbeamAlphaData() {
+  for (let i = 0; i < moonbeamAlphaContracts.length; i++) {
+    const contract = moonbeamAlphaContracts[i];
+    const latestBlock = await moonbeamAlphaClient.getBlockNumber();
+
+    // Calculate the initial range for the first 700 blocks
+    let startBlock = parseInt(contract.block, 10);
+    let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+
+    while (startBlock <= latestBlock) {
+      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+
+      const logs = await moonbeamAlphaClient.getLogs({
+        address: contract.address,
+        events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+        fromBlock: BigInt(startBlock),
+        toBlock: BigInt(endBlock),
+      });
+
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "moonbeam-alpha",
+        };
+
+        await db.collection("events").insertOne(data);
+      }
+
+      // Move to the next range of 700 blocks
+      startBlock = endBlock + 1;
+      endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
+    }
+
+    contract.block = endBlock;
+  }
+}
+
+// Watch events for a contract
+
+// setInterval(() => {
+//   scrapeMumabiData();
+//   scrapeSepoliaData();
+//   scrapeBaseSepoliaData();
+//   scrapeArbitrumSepoliaData();
+//   scrapeMoonbeamAlphaData();
+// }, 60000);
+
+scrapeMumabiData();
+scrapeSepoliaData();
+scrapeBaseSepoliaData();
+scrapeArbitrumSepoliaData();
+scrapeMoonbeamAlphaData();
+
+/* Viem Implementation Ends */
+
+for (let i = 0; i < mumbaiContracts.length; i++) {
+  const contract = mumbaiContracts[i];
+  console.log(`Watching contract ${contract.address}`)
+  mumbaiClient.watchEvent({
+    address: contract.address,
+    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+    onLogs: async (logs) => {
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "polygon-mumbai",
+        };
+        await db.collection("events").insertOne(data);
+      }
     },
   });
-});
+}
+
+for (let i = 0; i < sepoliaContracts.length; i++) {
+  const contract = sepoliaContracts[i];
+  console.log(`Watching contract ${contract.address}`)
+  sepoliaClient.watchEvent({
+    address: contract.address,
+    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+    onLogs: async (logs) => {
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+    },
+  });
+}
+
+for (let i = 0; i < baseSepoliaContracts.length; i++) {
+  const contract = baseSepoliaContracts[i];
+  console.log(`Watching contract ${contract.address}`)
+  baseSepoliaClient.watchEvent({
+    address: contract.address,
+    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+    onLogs: async (logs) => {
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "base-sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+    },
+  });
+}
+
+for (let i = 0; i < arbitrumSepoliaContracts.length; i++) {
+  const contract = arbitrumSepoliaContracts[i];
+  console.log(`Watching contract ${contract.address}`)
+  arbitrumSepoliaClient.watchEvent({
+    address: contract.address,
+    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+    onLogs: async (logs) => {
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "arbitrum-sepolia",
+        };
+        await db.collection("events").insertOne(data);
+      }
+    },
+  });
+}
+
+for (let i = 0; i < moonbeamAlphaContracts.length; i++) {
+  const contract = moonbeamAlphaContracts[i];
+  console.log(`Watching contract ${contract.address}`)
+  moonbeamAlphaClient.watchEvent({
+    address: contract.address,
+    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+    onLogs: async (logs) => {
+      for (let j = 0; j < logs.length; j++) {
+        const log = logs[j];
+        const data = {
+          ...log,
+          timestamp: Date.now(),
+          network: "moonbeam-alpha",
+        };
+        await db.collection("events").insertOne(data);
+      }
+    },
+  });
+}
 
 app.listen(port, () => {
   client.connect().then(() => {

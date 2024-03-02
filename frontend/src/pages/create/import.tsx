@@ -3,8 +3,8 @@ import LoadingSpinner from "@/components/Spinner";
 import { capitalizeString, shortenEthereumAddress } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { ChangeEvent, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { ChangeEvent, use, useEffect, useState } from "react";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import Confetti from "react-confetti";
 import useWindowSize from "@/hooks/useWindowSize";
 
@@ -14,6 +14,22 @@ import { useChainModal } from "@rainbow-me/rainbowkit";
 import ChainDropdown from "@/components/Dropdown/ChainDropdown";
 import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
 import ChooseChainDropdown from "@/components/Dropdown/ChooseChainDropdown";
+import {
+  venusMoonbaseNftAbi,
+  venusMoonbaseNftAddress,
+  wormholeChainIds,
+} from "@/utils/constants";
+import {
+  createPublicClient,
+  formatUnits,
+  getContract,
+  http,
+  parseEther,
+  parseGwei,
+} from "viem";
+import { moonbaseAlpha } from "viem/chains";
+import axios from "axios";
+import readFileAsBase64 from "@/utils/readFileAsBase64";
 export default function Import() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -29,14 +45,34 @@ export default function Import() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState("");
   const [selectedChain, setSelectedChain] = useState("1287");
+  const [mintFee, setMintFee] = useState<bigint>(BigInt(0));
   const [chains, setChains] = useState([
     "1287",
     "80001",
     "11155111",
-    "59140",
     "84532",
     "421614",
   ]);
+  const { writeContractAsync: mintNft } = useWriteContract();
+  const publicClient = createPublicClient({
+    chain: moonbaseAlpha,
+    transport: http(),
+  });
+  const contract = getContract({
+    address: venusMoonbaseNftAddress,
+    abi: venusMoonbaseNftAbi,
+    client: publicClient,
+  });
+  useEffect(() => {
+    (async function getMintFee() {
+      const response = await contract.read.quoteCrossChainCall([
+        wormholeChainIds[selectedChain],
+        "200000",
+      ]);
+      console.log(response);
+      setMintFee(response as bigint);
+    })();
+  }, [selectedChain]);
 
   const { openChainModal } = useChainModal();
 
@@ -135,7 +171,7 @@ export default function Import() {
                   Confirmation
                 </p>
                 <p className="ml-4 mb-2 text-[#9c9e9e] font-semibold text-sm">
-                  Mint Fee: 2 &nbsp;GLMR
+                  Mint Fee: {formatUnits(mintFee, 18)} &nbsp;GLMR
                 </p>
               </div>
             </div>
@@ -153,7 +189,63 @@ export default function Import() {
                 Generate and Mint NFT
               </p>
               <button
-                onClick={async () => {}}
+                onClick={async () => {
+                  try {
+                    const base64Image = await readFileAsBase64(
+                      selectedFile as File
+                    );
+                    console.log(base64Image);
+                    const imageRes = await axios.post(
+                      "/api/pinata/image",
+                      JSON.stringify({ file: base64Image }),
+                      {
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      }
+                    );
+                    console.log(imageRes.data.IpfsHash);
+                    const metadata = {
+                      name: "NFT Artwork",
+                      description:
+                        "A unique digital artwork stored on the blockchain as an NFT.",
+                      image: imageRes.data.IpfsHash,
+                      attributes: [],
+                      external_url: "https://venus-nine.vercel.app/",
+                      background_color: "FFFFFF",
+                    };
+
+                    const res = await axios.post("/api/pinata/json", metadata, {
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                    });
+                    let uri = "00";
+                    console.log([
+                      address as string,
+                      res.data.IpfsHash,
+                      "0x",
+                      selectedChain,
+                      "200000",
+                      mintFee,
+                    ]);
+                    await mintNft({
+                      abi: venusMoonbaseNftAbi,
+                      address: venusMoonbaseNftAddress,
+                      functionName: "mintImportNft",
+                      args: [
+                        address as string,
+                        res.data.IpfsHash,
+                        "0x",
+                        selectedChain,
+                        "200000",
+                      ],
+                      value: mintFee,
+                    });
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
                 disabled={count != 1 || chain?.id != 1287}
                 className={`${
                   count != 1 || chain?.id != 1287
