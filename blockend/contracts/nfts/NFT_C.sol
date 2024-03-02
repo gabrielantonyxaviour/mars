@@ -8,7 +8,7 @@ contract NFT_C is ERC721, ERC721URIStorage {
     uint256 private _nextTokenId;
 
     constructor()
-        ERC721("NFT_C", "SFT")
+        ERC721("NFT_C", "NA")
     {}
 
     function safeMint(address to, string memory uri) public  {

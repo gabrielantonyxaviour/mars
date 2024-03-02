@@ -1,6 +1,6 @@
 require("@chainlink/env-enc").config();
 
-const DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS = 3;
+const DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS = 5;
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
@@ -49,27 +49,12 @@ const networks = {
     accounts,
     verifyApiKey: process.env.POLYGON_API_KEY || "UNSET",
     chainId: 80001,
-    confirmations: 5,
+    confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "MATIC",
     wormholeChainId: "5",
     wormholeCoreBridge: "0x0CBE91CF822c73C2315FB05100C2F714765d5c20",
     testing: "0x615270a5CBA6C1e34D7F8BCB5D26a5BC9285fA20",
     connector: "0xA3539Ae35C914950717FCf993716CbC980d8bc72",
-  },
-
-  lineaTestnet: {
-    url: "https://linea-goerli.public.blastapi.io",
-    gasPrice: undefined,
-    nonce: undefined,
-    accounts,
-    verifyApiKey: process.env.LINEA_API_KEY || "UNSET",
-    chainId: 59140,
-    confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
-    nativeCurrencySymbol: "ETH",
-    wormholeChainId: "",
-    wormholeCoreBridge: "",
-    testing: "",
-    connector: "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37",
   },
   baseSepolia: {
     url: "https://base-sepolia-rpc.publicnode.com",

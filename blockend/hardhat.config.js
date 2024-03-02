@@ -33,7 +33,6 @@ module.exports = {
       polygonMumbai: networks.polygonMumbai.verifyApiKey,
       arbitrumSepolia: networks.arbitrumSepolia.verifyApiKey,
       baseSepolia: networks.baseSepolia.verifyApiKey,
-      lineaTestnet: networks.lineaTestnet.verifyApiKey,
     },
     customChains: [
       {
@@ -50,14 +49,6 @@ module.exports = {
         urls: {
           apiURL: "https://api-sepolia.basescan.org/api",
           browserURL: "https://sepolia.basescan.org/",
-        },
-      },
-      {
-        network: "lineaTestnet",
-        chainId: networks.lineaTestnet.chainId,
-        urls: {
-          apiURL: "https://api-testnet.lineascan.build/api",
-          browserURL: "https://goerli.lineascan.build/",
         },
       },
     ],

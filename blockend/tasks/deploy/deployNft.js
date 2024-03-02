@@ -8,13 +8,13 @@ task("deploy-nft", "Deploys the NFT contract")
     types.boolean
   )
   .setAction(async (taskArgs) => {
-    const nftContract = "NFT_A";
-    console.log(`Deploying NFT_A contract to ${network.name}`);
+    const nftContract = "NFT_B";
+    console.log(`Deploying NFT_B contract to ${network.name}`);
 
     console.log("\n__Compiling Contracts__");
     await run("compile");
 
-    const sampleNftFactory = await ethers.getContractFactory("NFT_A");
+    const sampleNftFactory = await ethers.getContractFactory("NFT_B");
     const sampleNft = await sampleNftFactory.deploy();
 
     console.log(
@@ -29,7 +29,7 @@ task("deploy-nft", "Deploys the NFT contract")
       networks[network.name].confirmations
     );
 
-    console.log("\nDeployed NFT_A contract to:", sampleNft.address);
+    console.log("\nDeployed NFT_B contract to:", sampleNft.address);
 
     if (network.name === "localFunctionsTestnet") {
       return;
@@ -66,6 +66,6 @@ task("deploy-nft", "Deploys the NFT contract")
     }
 
     console.log(
-      `\n NFT_A contract deployed to ${sampleNft.address} on ${network.name}`
+      `\n NFT_B contract deployed to ${sampleNft.address} on ${network.name}`
     );
   });
