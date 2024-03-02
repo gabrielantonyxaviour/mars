@@ -3,13 +3,23 @@ import Layout from "@/components/Layout";
 import ListingCard from "@/components/ListingCard";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 
 export default function ListingPage() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState(true);
-  const [nfts, setNfts] = useState([]);
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    (async function () {
+      console.log("FETCHIGN LISTINGS");
+      const lstgs = await axios.get("/api/drpc/get-listings");
+      console.log(lstgs.data.data);
+      setListings(lstgs.data.data);
+    })();
+  }, []);
 
   return (
     <Layout>
@@ -73,32 +83,26 @@ export default function ListingPage() {
                   : "grid-cols-5 desktop:grid-cols-6"
               } gap-3 mx-8`}
             >
-              <ListingCard
-                key={1}
-                image={
-                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
-                }
-                listingId="1"
-                createdAt="2024-02-28 15:45:36.180961+00"
-                validity={900000}
-                price="21"
-                chainId="80001"
-                mode={"create 🪄"}
-                size={300}
-              />
-              <ListingCard
-                key={2}
-                image={
-                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
-                }
-                listingId="2"
-                createdAt="2024-02-28 15:45:36.180961+00"
-                validity={900000}
-                price="3"
-                chainId="421614"
-                mode={"external 🌐"}
-                size={300}
-              />
+              {listings != null &&
+                listings.length > 0 &&
+                listings.map((listing: any, index) => (
+                  <ListingCard
+                    key={index}
+                    image={
+                      listing.tokenAddress == undefined
+                        ? "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmPbFa12vQjYiy9E1G7SQskVvFNgyxcJnwiMjHSNABWzYk"
+                        : listing.tokenAddress
+                    }
+                    listingId={listing.listingID}
+                    createdAt={new Date(listing.timestamp).toISOString()}
+                    validity={listing.validity}
+                    price={listing.price}
+                    seller={listing.seller}
+                    chainId={listing.nativeChainId}
+                    mode={"create 🪄"}
+                    size={300}
+                  />
+                ))}
             </div>
           </div>
         </div>

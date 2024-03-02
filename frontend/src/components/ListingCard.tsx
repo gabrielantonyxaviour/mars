@@ -11,6 +11,7 @@ export default function ListingCard({
   price,
   chainId,
   createdAt,
+  seller,
   validity,
   mode,
   size,
@@ -18,6 +19,7 @@ export default function ListingCard({
   image: string;
   chainId: string;
   listingId: string;
+  seller: string;
   createdAt: string;
   price: string;
   mode: string;

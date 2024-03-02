@@ -144,7 +144,7 @@ export default function Profile(props: { address: string }) {
                   size={300}
                 />
               ))}
-            {selected == 1 && (
+            {/* {selected == 1 && (
               <ListingCard
                 image={
                   "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
@@ -157,7 +157,7 @@ export default function Profile(props: { address: string }) {
                 mode={"create 🪄"}
                 size={300}
               />
-            )}
+            )} */}
             {selected == 2 && (
               <OrderCard
                 image={
