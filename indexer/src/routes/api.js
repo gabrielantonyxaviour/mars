@@ -83,6 +83,23 @@ router.get("/nfts/:owner", async (req, res) => {
     $and: [],
   };
 
+  if (mode) {
+    if (mode === "external") {
+      filter.$and.push({
+        address: {
+          $in: nftMode.external,
+        },
+      });
+    }
+    if (mode === "internal") {
+      filter.$and.push({
+        address: {
+          $in: nftMode.internal,
+        },
+      });
+    }
+  }
+
   if (type == "ai") {
     filter.$and.push({ "args.minter": req.params.owner });
     filter.$and.push({ "args.nftType": true });
@@ -94,23 +111,6 @@ router.get("/nfts/:owner", async (req, res) => {
   } else {
     filter.$and.push({ "args.to": req.params.owner });
     filter.$and.push({ eventName: "Transfer" });
-
-    if (mode) {
-      if (mode === "external") {
-        filter.$and.push({
-          address: {
-            $in: nftMode.external,
-          },
-        });
-      }
-      if (mode === "internal") {
-        filter.$and.push({
-          address: {
-            $in: nftMode.internal,
-          },
-        });
-      }
-    }
   }
 
   if (chain) {
@@ -225,7 +225,7 @@ router.get("/listings", async (req, res) => {
       },
       {
         $project: {
-          address: 1,
+          address: "$args.tokenAddress",
           tokenId: "$args.tokenId",
           seller: "$args.seller",
           chainId: 1,
@@ -235,6 +235,9 @@ router.get("/listings", async (req, res) => {
           price: "$args.priceInNative",
           listingID: "$args.listingId",
           nativeChainId: "$args.chainId",
+          internal: {
+            $in: [{ $toLower: "$args.tokenAddress" }, nftMode.internal],
+          },
         },
       },
     ])
@@ -263,7 +266,7 @@ router.get("/listings/:owner", async (req, res) => {
       },
       {
         $project: {
-          address: 1,
+          address: "$args.tokenAddress",
           tokenId: "$args.tokenId",
           seller: "$args.seller",
           chainId: 1,
@@ -273,6 +276,9 @@ router.get("/listings/:owner", async (req, res) => {
           price: "$args.priceInNative",
           listingID: "$args.listingId",
           nativeChainId: "$args.chainId",
+          internal: {
+            $in: [{ $toLower: "$args.tokenAddress" }, nftMode.internal],
+          },
         },
       },
     ])
@@ -288,78 +294,133 @@ router.get("/order/:orderID", async (req, res) => {
     .collection("events")
     .aggregate([
       {
-        $match: {
-          "args.orderId": parseInt(req.params.orderID),
+        $facet: {
+          nft: [
+            {
+              $match: {
+                "args.orderId": parseInt(req.params.orderID),
+                eventName: "NftPurchaseInitiated",
+              },
+            },
+            {
+              $project: {
+                listingId: "$args.foreignChainListingId",
+              },
+            },
+            {
+              $lookup: {
+                from: "events",
+                localField: "listingId",
+                foreignField: "args.listingId",
+                as: "results",
+              },
+            },
+            {
+              $project: {
+                data: {
+                  $arrayElemAt: ["$results", 0],
+                },
+              },
+            },
+            {
+              $project: {
+                address: "$data.address",
+                tokenId: "$data.args.tokenId",
+                originChainId: "$data.args.chainId",
+                chainId: "$data.chainId",
+                network: "$data.network",
+                validity: "$data.args.validity",
+                price: "$data.args.priceInNative",
+              },
+            },
+          ],
+          transactionHashData: [
+            {
+              $match: {
+                "args.orderId": parseInt(req.params.orderID),
+              },
+            },
+            {
+              $project: {
+                initiated: {
+                  $cond: [
+                    {
+                      $eq: ["$eventName", "NftPurchaseInitiated"],
+                    },
+                    "$transactionHash",
+                    null,
+                  ],
+                },
+                relayed: {
+                  $cond: [
+                    {
+                      $eq: ["$eventName", "ConfirmationRelayed"],
+                    },
+                    "$transactionHash",
+                    null,
+                  ],
+                },
+                completed: {
+                  $cond: [
+                    {
+                      $eq: ["$eventName", "NftPurchaseCompleted"],
+                    },
+                    "$transactionHash",
+                    null,
+                  ],
+                },
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                relayed: {
+                  $push: "$relayed",
+                },
+                initiated: {
+                  $push: "$initiated",
+                },
+                completed: {
+                  $push: "$completed",
+                },
+              },
+            },
+            {
+              $project: {
+                relayed: {
+                  $setDifference: ["$relayed", [null]],
+                },
+                initiated: {
+                  $setDifference: ["$initiated", [null]],
+                },
+                completed: {
+                  $setDifference: ["$completed", [null]],
+                },
+              },
+            },
+            {
+              $project: {
+                initiated: {
+                  $arrayElemAt: ["$initiated", 0],
+                },
+                completed: {
+                  $arrayElemAt: ["$completed", 0],
+                },
+                relayed: {
+                  $arrayElemAt: ["$relayed", 0],
+                },
+              },
+            },
+          ],
         },
       },
       {
         $project: {
-          initiated: {
-            $cond: [
-              {
-                $eq: ["$eventName", "NftPurchaseInitiated"],
-              },
-              "$transactionHash",
-              null,
-            ],
+          nft: {
+            $arrayElemAt: ["$nft", 0],
           },
-          relayed: {
-            $cond: [
-              {
-                $eq: ["$eventName", "ConfirmationRelayed"],
-              },
-              "$transactionHash",
-              null,
-            ],
-          },
-          completed: {
-            $cond: [
-              {
-                $eq: ["$eventName", "NftPurchaseCompleted"],
-              },
-              "$transactionHash",
-              null,
-            ],
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          relayed: {
-            $push: "$relayed",
-          },
-          initiated: {
-            $push: "$initiated",
-          },
-          completed: {
-            $push: "$completed",
-          },
-        },
-      },
-      {
-        $project: {
-          relayed: {
-            $setDifference: ["$relayed", [null]],
-          },
-          initiated: {
-            $setDifference: ["$initiated", [null]],
-          },
-          completed: {
-            $setDifference: ["$completed", [null]],
-          },
-        },
-      },
-      {
-        $project: {
-          initiated: {
-            $arrayElemAt: ["$initiated", 0],
-          },
-          completed: {
-            $arrayElemAt: ["$completed", 0],
-          },
-          relayed: {
-            $arrayElemAt: ["$relayed", 0],
+          hashData: {
+            $arrayElemAt: ["$transactionHashData", 0],
           },
         },
       },
@@ -384,7 +445,7 @@ router.get("/listing/:listingID", async (req, res) => {
       },
       {
         $project: {
-          address: 1,
+          address: '$args.tokenAddress',
           tokenId: "$args.tokenId",
           seller: "$args.seller",
           chainId: 1,
@@ -422,17 +483,16 @@ router.get("/nft/:tokenAddress/:tokenId", async (req, res) => {
             },
           ],
         },
-        
       },
       {
         $project: {
           address: 1,
-          tokenId: '$args.tokenId',
-          owner: '$args.to',
+          tokenId: "$args.tokenId",
+          owner: "$args.to",
           chainId: 1,
-          network: 1
-        }
-      }
+          network: 1,
+        },
+      },
     ])
     .toArray();
   res.json({

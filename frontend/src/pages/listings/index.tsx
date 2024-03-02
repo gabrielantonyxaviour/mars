@@ -88,16 +88,12 @@ export default function ListingPage() {
                 listings.map((listing: any, index) => (
                   <ListingCard
                     key={index}
-                    image={
-                      listing.tokenAddress == undefined
-                        ? "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmPbFa12vQjYiy9E1G7SQskVvFNgyxcJnwiMjHSNABWzYk"
-                        : listing.tokenAddress
-                    }
+                    tokenAddress={listing.address}
+                    tokenId={listing.tokenId}
                     listingId={listing.listingID}
                     createdAt={new Date(listing.timestamp).toISOString()}
                     validity={listing.validity}
                     price={listing.price}
-                    seller={listing.seller}
                     chainId={listing.nativeChainId}
                     mode={"create 🪄"}
                     size={300}

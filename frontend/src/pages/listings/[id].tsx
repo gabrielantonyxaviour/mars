@@ -28,21 +28,10 @@ import {
   wormholeChainIds,
 } from "@/utils/constants";
 import { shortenEthereumAddress } from "@/utils";
-import {
-  arbitrumSepolia,
-  baseSepolia,
-  moonbaseAlpha,
-  polygonMumbai,
-  sepolia,
-} from "viem/chains";
+import { moonbaseAlpha } from "viem/chains";
 import axios from "axios";
-function resolveChain(chainId: string) {
-  if (chainId == "1287") return moonbaseAlpha;
-  else if (chainId == "80001") return polygonMumbai;
-  else if (chainId == "11155111") return sepolia;
-  else if (chainId == "84532") return baseSepolia;
-  else return arbitrumSepolia;
-}
+import resolveChain from "@/utils/resolveChain";
+
 export default function Listing() {
   const router = useRouter();
   const { id } = router.query;
@@ -149,9 +138,9 @@ export default function Listing() {
           <div className="flex justify-between w-full">
             <div className="flex flex-col">
               <NFTCard
-                tokenAddress={"0x123"}
-                tokenId={"1"}
-                chainId={"80001"}
+                tokenAddress={listing.address}
+                tokenId={listing.tokenId}
+                chainId={listing.nativeChainId}
                 mode={"create ✨"}
                 size={300}
               />
@@ -166,9 +155,7 @@ export default function Listing() {
                     type="text"
                     placeholder={"Click on the box to upload your NFT"}
                     value={
-                      "listing.tokenAddress" == undefined
-                        ? address
-                        : " listing.tokenAddress"
+                      listing.address == undefined ? address : listing.address
                     }
                     disabled={true}
                     className="font-theme font-semibold text-[#6c6f70] text-md bg-[#25272b] border border-[#25272b] focus:border-white my-1 pl-6 p-2 rounded-xl focus:outline-none  w-full flex-shrink-0 mr-2"
@@ -189,7 +176,7 @@ export default function Listing() {
                 <div className="">
                   <p className="font-semibold text-md">Origin Chain</p>
                   <Image
-                    src={`/chains/${listing.chainId}.png`}
+                    src={`/chains/${listing.nativeChainId}.png`}
                     width={60}
                     height={60}
                     alt={"Listing"}

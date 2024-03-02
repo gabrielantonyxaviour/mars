@@ -1,25 +1,28 @@
+import { nftContractAbi } from "@/utils/constants";
+import resolveChain from "@/utils/resolveChain";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPublicClient, getContract, http } from "viem";
 import { useAccount } from "wagmi";
 
 export default function ListingCard({
-  image,
   listingId,
   price,
   chainId,
   createdAt,
-  seller,
+  tokenAddress,
+  tokenId,
   validity,
   mode,
   size,
 }: {
-  image: string;
   chainId: string;
   listingId: string;
-  seller: string;
+  tokenAddress: string;
+  tokenId: string;
   createdAt: string;
   price: string;
   mode: string;
@@ -28,7 +31,32 @@ export default function ListingCard({
 }) {
   const { chain } = useAccount();
   const [timeLeft, setTimeLeft] = useState(0);
+  const [image, setImage] = useState("");
+  const publicClient = createPublicClient({
+    chain: resolveChain(chainId),
+    transport: http(),
+  });
+  const contract = getContract({
+    address: tokenAddress as `0x${string}`,
+    abi: nftContractAbi,
+    client: publicClient,
+  });
 
+  useEffect(() => {
+    (async function getTokenUri() {
+      try {
+        console.log(chainId);
+        const resTokenUri = await contract.read.tokenURI([tokenId]);
+        console.log(resTokenUri);
+        const metadata = await fetch(resTokenUri as string);
+        const metadataJson = await metadata.json();
+        const _image = metadataJson.image;
+        setImage(_image);
+      } catch (e) {
+        console.log(e);
+      }
+    })();
+  }, []);
   useEffect(() => {
     const targetTimestamp =
       Math.floor(new Date(createdAt).getTime() / 1000) + validity;
