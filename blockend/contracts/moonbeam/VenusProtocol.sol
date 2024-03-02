@@ -24,10 +24,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         FAILED
     }
 
-    enum Relayer {
-        WORMHOLE,
-        AXELAR
-    }
 
     struct Listing {
         address seller;
@@ -44,7 +40,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint256 listingId;
         uint256 chainId;
         address buyer;
-        Relayer relayer;
         OrderStatus status;
     }
     
@@ -60,9 +55,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     mapping(uint256 => Listing) public listings;
     mapping(uint256 => Order) public orders;
     mapping(uint16 => address) public whitelistedWormholeAddresses;
-    mapping(string => string) public whitelistedAxelarAddresses;
     mapping(uint256=>uint16) public chainIdsToWormholeChainIds;
-    mapping(uint256=>string) public chainIdsToAxelarChainNames;
     mapping(address=>uint256) public claimables;
     uint256 public orderIdCounter;
     uint256 public listingIdCounter;
@@ -97,13 +90,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         }
     }
 
-    function whitelistAxelarAddresses(uint256[] memory _chainIds, string[] memory _chainNames, string[] memory _destinationAddresses) public onlyOwner{
-        for(uint i=0; i<_chainIds.length; i++){
-            whitelistedAxelarAddresses[_chainNames[i]] = _destinationAddresses[i];
-            chainIdsToAxelarChainNames[_chainIds[i]] = _chainNames[i];
-        }
-    }
-
     function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue) public payable  returns(uint256 orderId){
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
         uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue);
@@ -112,7 +98,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         if(!listings[listingId].isActive) revert NotActive(listingId);
         if(whitelistedWormholeAddresses[wormholeChainId] == address(0)) revert NotWhiteListedChain(wormholeChainId);
         
-        orders[orderIdCounter]=Order(orderIdCounter, listingId, listings[listingId].chainId, msg.sender, Relayer.WORMHOLE, OrderStatus.PENDING);
+        orders[orderIdCounter]=Order(orderIdCounter, listingId, listings[listingId].chainId, msg.sender, OrderStatus.PENDING);
         wormholeRelayer.sendPayloadToEvm{value: cost}(
             wormholeChainId,
             whitelistedWormholeAddresses[wormholeChainId],
@@ -129,10 +115,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         return orderIdCounter-1;
     }
 
-    // function purchaseNFTViaAxelar(uint256 listingId) public payable returns(uint256 orderId)
-    // {
-
-    // }
 
     function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice, uint256 validity, uint256 chainId, CrossChainQueryData calldata _crosschainQueryData) public {
         // Wormhole Cross chain queries for fetching approval

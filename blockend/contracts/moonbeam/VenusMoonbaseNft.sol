@@ -20,9 +20,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
     uint256 public aiMintFee;
     uint256 public importMintFee;
     mapping(uint16 => address) public whitelistedWormholeAddresses;
-    mapping(string => string) public whitelistedAxelarAddresses;
     mapping(uint256=>uint16) public chainIdsToWormholeChainIds;
-    mapping(uint256=>string) public chainIdsToAxelarChainNames;
     uint256 public constant GAS_LIMIT = 80_000;
 
     constructor(address initialOwner, address _wormholeRelayer, uint256 _aiMintFee, uint256 _importMintFee)
@@ -55,13 +53,6 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         for(uint i=0; i<_wormholeChainIds.length; i++){
             whitelistedWormholeAddresses[_wormholeChainIds[i]] = _destinationAddresses[i];
             chainIdsToWormholeChainIds[chainIds[i]] = _wormholeChainIds[i];
-        }
-    }
-
-    function whitelistAxelarAddresses(uint256[] memory _chainIds, string[] memory _chainNames, string[] memory _destinationAddresses) public onlyOwner{
-        for(uint i=0; i<_chainNames.length; i++){
-            whitelistedAxelarAddresses[_chainNames[i]] = _destinationAddresses[i];
-            chainIdsToAxelarChainNames[_chainIds[i]] = _chainNames[i];
         }
     }
 

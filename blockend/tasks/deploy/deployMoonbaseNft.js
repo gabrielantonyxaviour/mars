@@ -1,6 +1,6 @@
 const { networks } = require("../../networks");
 
-task("deploy-connector", "Deploys the VenusConnector contract")
+task("deploy-venus-nft", "Deploys the VenusMoonbaseNft contract")
   .addOptionalParam(
     "verify",
     "Set to true to verify contract",
@@ -8,39 +8,37 @@ task("deploy-connector", "Deploys the VenusConnector contract")
     types.boolean
   )
   .setAction(async (taskArgs) => {
-    console.log(`Deploying VenusConnector contract to ${network.name}`);
+    console.log(`Deploying VenusMoonbaseNft contract to ${network.name}`);
 
     console.log("\n__Compiling Contracts__");
     await run("compile");
-
-    const relayer = networks[network.name].wormholeRelayer;
-    const protocolAddress = networks.moonbaseAlpha.protocol;
-    const protocolWormholeChainId = networks.moonbaseAlpha.wormholeChainId;
-    const connectorContractFactory = await ethers.getContractFactory(
-      "VenusConnector"
+    const initialOwner = "0x0429A2Da7884CA14E53142988D5845952fE4DF6a";
+    const wormholeRelayer = networks.moonbaseAlpha.wormholeRelayer;
+    const aiMintFee = "0";
+    const importMintFee = "0";
+    const sampleNftFactory = await ethers.getContractFactory(
+      "VenusMoonbaseNft"
     );
-    const connectorContract = await connectorContractFactory.deploy(
-      relayer,
-      protocolAddress,
-      protocolWormholeChainId
+    const sampleNft = await sampleNftFactory.deploy(
+      initialOwner,
+      wormholeRelayer,
+      aiMintFee,
+      importMintFee
     );
 
     console.log(
       `\nWaiting ${
         networks[network.name].confirmations
       } blocks for transaction ${
-        connectorContract.deployTransaction.hash
+        sampleNft.deployTransaction.hash
       } to be confirmed...`
     );
 
-    await connectorContract.deployTransaction.wait(
+    await sampleNft.deployTransaction.wait(
       networks[network.name].confirmations
     );
 
-    console.log(
-      "\nDeployed VenusConnector contract to:",
-      connectorContract.address
-    );
+    console.log("\nDeployed VenusMoonbaseNft contract to:", sampleNft.address);
 
     if (network.name === "localFunctionsTestnet") {
       return;
@@ -56,11 +54,12 @@ task("deploy-connector", "Deploys the VenusConnector contract")
       try {
         console.log("\nVerifying contract...");
         await run("verify:verify", {
-          address: connectorContract.address,
+          address: sampleNft.address,
           constructorArguments: [
-            relayer,
-            protocolAddress,
-            protocolWormholeChainId,
+            initialOwner,
+            wormholeRelayer,
+            aiMintFee,
+            importMintFee,
           ],
         });
         console.log("Contract verified");
@@ -81,6 +80,6 @@ task("deploy-connector", "Deploys the VenusConnector contract")
     }
 
     console.log(
-      `\n VenusConnector contract deployed to ${connectorContract.address} on ${network.name}`
+      `\n VenusMoonbaseNft contract deployed to ${sampleNft.address} on ${network.name}`
     );
   });

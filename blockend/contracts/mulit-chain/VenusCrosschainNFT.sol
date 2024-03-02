@@ -21,7 +21,7 @@ contract VenusCrosschainNft is IWormholeReceiver, ERC721, ERC721URIStorage{
 
     mapping(uint256 => bool) public nftTypes;
 
-    constructor (address _wormholeRelayer, address _minterAddress, uint16 _minterWormholeChainId, string memory _minterAxelarChainName)  ERC721("VenusCrosschainNFT", "VCC") {
+    constructor (address _wormholeRelayer, address _minterAddress, uint16 _minterWormholeChainId)  ERC721("VenusCrosschainNFT", "VCC") {
         wormholeRelayer = IWormholeRelayer(_wormholeRelayer);
         minterAddress = bytes32(uint256(uint160(_minterAddress)));
         minterWormholeChainId = _minterWormholeChainId;
