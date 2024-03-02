@@ -86,7 +86,7 @@ export default function Profile(props: { address: string }) {
       <div className="relative">
         <div className="absolute bottom-24 left-10 w-full h-full">
           <Image
-            src={"/chains/moonbeam.png"}
+            src={"/chains/1287.png"}
             width={150}
             height={150}
             alt="pfp"
