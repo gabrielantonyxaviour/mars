@@ -26,7 +26,7 @@ const networks = {
     nativeCurrencySymbol: "ETH",
     wormholeChainId: "16",
     wormholeRelayer: "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
-    minterAddress: "0xBbF4E51Cfa0f681a4eBBC5E800b4f53507B00A5B",
+    minterAddress: "0x620b89DeE45a3Fb1675182B8AD538B656b3D8366",
     protocol: "",
   },
   ethereumSepolia: {
