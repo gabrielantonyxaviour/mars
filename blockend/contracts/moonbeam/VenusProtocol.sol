@@ -90,17 +90,17 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         _;
     }
 
-    function whitelistWormholeAddress(uint256[] memory chainIds, uint16[] memory _wormholeChainIds, address[] memory destinationAddresses) public onlyOwner{
+    function whitelistWormholeAddress(uint256[] memory _chainIds, uint16[] memory _wormholeChainIds, address[] memory _destinationAddresses) public onlyOwner{
         for(uint i=0; i<_wormholeChainIds.length; i++){
-            whitelistedWormholeAddresses[_wormholeChainIds[i]] = destinationAddresses[i];
-            chainIdsToWormholeChainIds[chainIds[i]] = _wormholeChainIds[i];
+            whitelistedWormholeAddresses[_wormholeChainIds[i]] = _destinationAddresses[i];
+            chainIdsToWormholeChainIds[_chainIds[i]] = _wormholeChainIds[i];
         }
     }
 
-    function whitelistAxelarAddresses(uint256[] memory chainIds, string[] memory chainNames, string[] memory destinationAddresses) public onlyOwner{
-        for(uint i=0; i<chainIds.length; i++){
-            chainIdsToAxelarChainNames[chainIds[i]] = destinationAddresses[i];
-            whitelistedAxelarAddresses[chainNames[i]] = destinationAddresses[i];
+    function whitelistAxelarAddresses(uint256[] memory _chainIds, string[] memory _chainNames, string[] memory _destinationAddresses) public onlyOwner{
+        for(uint i=0; i<_chainIds.length; i++){
+            whitelistedAxelarAddresses[_chainNames[i]] = _destinationAddresses[i];
+            chainIdsToAxelarChainNames[_chainIds[i]] = _chainNames[i];
         }
     }
 
@@ -155,10 +155,10 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         signatures[0] = IWormhole.Signature(__crosschainQueryData.r,__crosschainQueryData.s, __crosschainQueryData.v, __crosschainQueryData.guardianIndex);
         ParsedQueryResponse memory r = parseAndVerifyQueryResponse(__crosschainQueryData.response, signatures);
         EthCallQueryResponse memory eqr = parseEthCallQueryResponse(r.responses[0]);
-        address owner=abi.decode(eqr.result[0].result, (address));
+        address _owner=abi.decode(eqr.result[0].result, (address));
 
-        emit CrossChainQueryLogger(r, eqr, owner);
-        return owner == msg.sender;
+        emit CrossChainQueryLogger(r, eqr, _owner);
+        return _owner == msg.sender;
     }
 
 
