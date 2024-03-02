@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 export default function ListingCard({
   image,
@@ -24,7 +24,7 @@ export default function ListingCard({
   validity: number;
   size: number;
 }) {
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {

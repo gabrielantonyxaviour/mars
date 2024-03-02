@@ -4,14 +4,7 @@ import { capitalizeString, shortenEthereumAddress } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  useAccount,
-  useContractEvent,
-  useContractRead,
-  useContractWrite,
-  useNetwork,
-  useWalletClient,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import Confetti from "react-confetti";
 import useWindowSize from "@/hooks/useWindowSize";
 import { decodeEventLog, formatUnits } from "viem";
@@ -27,7 +20,7 @@ export default function Generate() {
   const { chain: chainQueryParam } = router.query;
   const { address } = useAccount();
   const { width, height } = useWindowSize();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState(0);
   const [messageId, setMessageId] = useState("");

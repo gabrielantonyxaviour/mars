@@ -7,53 +7,30 @@ import type { AppProps } from "next/app";
 
 import {
   darkTheme,
-  getDefaultWallets,
+  getDefaultConfig,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { publicProvider } from "wagmi/providers/public";
+import { WagmiProvider } from "wagmi";
 import {
   arbitrumSepolia,
   baseSepolia,
-  lineaTestnet,
   moonbaseAlpha,
   polygonMumbai,
   sepolia,
 } from "viem/chains";
-import { injectiveEvmTestnet, zircuitTestnet } from "@/utils/chains";
 
-const { chains, publicClient } = configureChains(
-  [
-    moonbaseAlpha,
-
-    sepolia,
-    baseSepolia,
-    arbitrumSepolia,
-    polygonMumbai,
-
-    lineaTestnet,
-    injectiveEvmTestnet,
-    zircuitTestnet,
-  ],
-  [publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: "Mars",
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? "",
-  chains,
-});
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
+const config = getDefaultConfig({
+  appName: "Venus Marketplace",
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID || "",
+  chains: [arbitrumSepolia, baseSepolia, moonbaseAlpha, polygonMumbai, sepolia],
+  ssr: true, // If your dApp uses server side rendering (SSR)
 });
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiProvider config={config}>
       <RainbowKitProvider
-        chains={chains}
+        initialChain={moonbaseAlpha}
+        showRecentTransactions={true}
         theme={darkTheme({
           accentColor: "#00A0BD",
           accentColorForeground: "white",
@@ -65,6 +42,6 @@ export default function App({ Component, pageProps }: AppProps) {
       >
         <Component {...pageProps} />
       </RainbowKitProvider>
-    </WagmiConfig>
+    </WagmiProvider>
   );
 }

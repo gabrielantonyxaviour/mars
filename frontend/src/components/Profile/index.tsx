@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 // import resolveRarity from "@/utils/resolveRarity";
 // import getRelationshipsByCreator from "@/utils/supabase/get-relationships-by-creator";
 // import RelationshipCard from "./RelationshipCard";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import NFTCard from "../NFTCard";
 import ListingCard from "../ListingCard";
 import OrderCard from "../OrderCard";
@@ -18,7 +18,7 @@ import OrderCard from "../OrderCard";
 
 export default function Profile(props: { address: string }) {
   const { address } = props;
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [selected, setSelected] = useState(0);
   const [ownedNfts, setOwnedNfts] = useState([]);
   const [relationships, setRelationships] = useState([]);

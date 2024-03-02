@@ -10,13 +10,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { WalletClient, decodeEventLog } from "viem";
-import {
-  useAccount,
-  useContractEvent,
-  useContractWrite,
-  useNetwork,
-  useWalletClient,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import useWindowSize from "@/hooks/useWindowSize";
 import { explorers } from "@/utils/constants";
 import { shortenEthereumAddress } from "@/utils";

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 export default function NFTCard({
   image,
@@ -20,7 +20,7 @@ export default function NFTCard({
   mode: string;
   size: number;
 }) {
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
 
   return (
     <Link

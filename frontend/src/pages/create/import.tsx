@@ -4,17 +4,9 @@ import { capitalizeString, shortenEthereumAddress } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
-import {
-  useAccount,
-  useContractEvent,
-  useContractRead,
-  useContractWrite,
-  useNetwork,
-  useWalletClient,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import Confetti from "react-confetti";
 import useWindowSize from "@/hooks/useWindowSize";
-import { WalletClient, decodeEventLog, formatUnits } from "viem";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
@@ -25,19 +17,17 @@ import ChooseChainDropdown from "@/components/Dropdown/ChooseChainDropdown";
 export default function Import() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { width, height } = useWindowSize();
-  const { data: walletClient } = useWalletClient();
-  const { chain } = useNetwork();
   const [prompt, setPrompt] = useState("");
   const [count, setCount] = useState(0);
   const [messageId, setMessageId] = useState("");
   const [progress, setProgress] = useState(0);
-  const [imageAlt, setImageAlt] = useState("");
   const [approveSignature, setApproveSignature] = useState<`0x${string}`>();
   const [txHash, setTxHash] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageSrc, setImageSrc] = useState("");
   const [selectedChain, setSelectedChain] = useState("1287");
   const [chains, setChains] = useState([
     "1287",
@@ -76,18 +66,19 @@ export default function Import() {
   // Function to handle image selection
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-
+    console.log(file);
     if (file) {
-      // Use FileReader to read the selected file and set the image source
       const reader = new FileReader();
       reader.onload = (e) => {
-        const newImageSrc = e.target?.result as string;
-        setImageSrc(newImageSrc);
-        console.log(newImageSrc);
-        setCount(1);
+        if (e.target) {
+          setImageSrc(e.target.result as string);
+          console.log(e.target.result);
+        }
       };
       reader.readAsDataURL(file);
     }
+    setCount(1);
+    setSelectedFile(file || null);
   };
   return (
     <Layout>

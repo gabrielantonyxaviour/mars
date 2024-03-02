@@ -4,13 +4,12 @@ import ListingCard from "@/components/ListingCard";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 
 export default function ListingPage() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState(true);
   const [nfts, setNfts] = useState([]);
-  const { chain } = useNetwork();
 
   return (
     <Layout>
