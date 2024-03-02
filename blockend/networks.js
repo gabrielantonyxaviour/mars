@@ -1,6 +1,6 @@
 require("@chainlink/env-enc").config();
 
-const DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS = 5;
+const DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS = 3;
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
@@ -26,7 +26,7 @@ const networks = {
     nativeCurrencySymbol: "ETH",
     wormholeChainId: "16",
     wormholeRelayer: "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
-    minterAddress: "0xcfA34a6eAA2Db2E89f77E754B3Aa62BD82042556",
+    minterAddress: "0xBbF4E51Cfa0f681a4eBBC5E800b4f53507B00A5B",
     protocol: "",
   },
   ethereumSepolia: {
@@ -54,7 +54,7 @@ const networks = {
     nativeCurrencySymbol: "MATIC",
     wormholeChainId: "5",
     wormholeRelayer: "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
-    crossMintAddress: "0x65649189492c36D147CE8C15da0aBbc4FFF3f9Be",
+    crossMintAddress: "",
     connector: "",
   },
   baseSepolia: {

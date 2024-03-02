@@ -16,7 +16,7 @@ contract VenusConnector is IWormholeReceiver{
     bytes32 public immutable protocolAddress;
     uint16 public immutable protocolWormholeChainId;
 
-    uint256 public constant GAS_LIMIT = 200_000;
+    uint256 public gasLimit = 200_000;
 
 
     constructor (address _wormholeRelayer, address _protocolAddress, uint16 _protocolWormholeChainId) {
@@ -26,6 +26,10 @@ contract VenusConnector is IWormholeReceiver{
     }
     
     event ConfirmationRelayed(uint256 orderId, bool isAllowed);
+
+    function setGasLimit(uint256 _gasLimit) public {
+        gasLimit = _gasLimit;
+    }
 
     function receiveWormholeMessages(
         bytes memory payload,
@@ -52,7 +56,7 @@ contract VenusConnector is IWormholeReceiver{
             address(uint160(uint256(sourceAddress))),
             abi.encode(orderId, isAllowed), // payload
             0, // no receiver value needed since we're just passing a message
-            GAS_LIMIT
+            gasLimit
         );
         emit ConfirmationRelayed(orderId, isAllowed);
     }
@@ -63,7 +67,7 @@ contract VenusConnector is IWormholeReceiver{
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             receiverValue,
-            GAS_LIMIT
+            gasLimit
         );
     }
 

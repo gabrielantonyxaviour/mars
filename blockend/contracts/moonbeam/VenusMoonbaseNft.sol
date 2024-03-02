@@ -21,7 +21,6 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
     uint256 public importMintFee;
     mapping(uint16 => address) public whitelistedWormholeAddresses;
     mapping(uint256=>uint16) public chainIdsToWormholeChainIds;
-    uint256 public constant GAS_LIMIT = 80_000;
 
     constructor(address initialOwner, address _wormholeRelayer, uint256 _aiMintFee, uint256 _importMintFee)
         ERC721("SampleNft", "SFT")
@@ -51,7 +50,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         }
     }
 
-    function mintAiNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) public payable{
+    function mintAiNft(address _to, string memory _uri, bytes memory signature, uint256 chainId, uint256 gasLimit) public payable{
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
         uint256 cost = quoteCrossChainCall(wormholeChainId);
         
@@ -63,7 +62,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
                 whitelistedWormholeAddresses[wormholeChainId],
                 abi.encode(_to, _uri, true), // payload
                 0, // no receiver value needed since we're just passing a message
-                GAS_LIMIT
+                gasLimit
             );
             emit CrosschainMintSent(_nextTokenId, _to, _uri, true, chainId);
             _nextTokenId+=1;
@@ -73,7 +72,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         }
     }
 
-    function mintImportNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) public  payable {
+    function mintImportNft(address _to, string memory _uri, bytes memory signature, uint256 chainId, uint256 gasLimit) public  payable {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
         uint256 cost = quoteCrossChainCall(wormholeChainId);
         
@@ -84,7 +83,9 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
                 whitelistedWormholeAddresses[wormholeChainId],
                 abi.encode(_to, _uri, false), // payload
                 0, // no receiver value needed since we're just passing a message
-                GAS_LIMIT
+                gasLimit,
+                wormholeChainId,
+                owner
             );
             emit CrosschainMintSent(_nextTokenId, _to, _uri, true, chainId);
             _nextTokenId+=1;
@@ -101,12 +102,12 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
     }
 
     function quoteCrossChainCall(
-        uint16 targetChain
+        uint16 targetChain, uint256 gasLimit
     ) public view returns (uint256 cost) {
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             0,
-            GAS_LIMIT
+            gasLimit
         );
     }
 

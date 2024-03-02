@@ -51,7 +51,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         uint8 guardianIndex;
     }
 
-    uint256 public constant GAS_LIMIT = 200_000;
     mapping(uint256 => Listing) public listings;
     mapping(uint256 => Order) public orders;
     mapping(uint16 => address) public whitelistedWormholeAddresses;
@@ -90,7 +89,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         }
     }
 
-    function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue) public payable  returns(uint256 orderId){
+    function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue , uint256 gasLimit) public payable  returns(uint256 orderId){
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
         uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue);
         
@@ -103,8 +102,8 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
             wormholeChainId,
             whitelistedWormholeAddresses[wormholeChainId],
             abi.encode(orderIdCounter, listings[listingId].tokenAddress,listings[listingId].tokenId, msg.sender, listings[listingId].seller), // payload
-            receiverValue, // no receiver value needed since we're just passing a message
-            GAS_LIMIT,
+            receiverValue, 
+            gasLimit,
             wormholeChainId,
             owner
         );
@@ -178,12 +177,12 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     }
 
     function quoteCrossChainCall(
-        uint16 targetChain, uint256 receiverValue
+        uint16 targetChain, uint256 receiverValue, uint256 gasLimit
     ) public view returns (uint256 cost) {
         (cost, ) = wormholeRelayer.quoteEVMDeliveryPrice(
             targetChain,
             receiverValue,
-            GAS_LIMIT
+            gasLimit
         );
     }
 
