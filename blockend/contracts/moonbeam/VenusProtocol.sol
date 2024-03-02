@@ -13,7 +13,7 @@ error NotActive(uint256 listingId);
 error NotWhiteListedChain(uint16 chainId);
 error NotWhiteListedAddress(address sender);
 error NotRelayer(address sender);
-
+error InvalidChainId(uint256 chainId);
 
 contract VenusProtocol is QueryResponse, IWormholeReceiver {
 
@@ -89,8 +89,19 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
             chainIdsToWormholeChainIds[_chainIds[i]] = _wormholeChainIds[i];
         }
     }
+    function purchaseNft(uint256 listingId) public payable {
+        if(msg.value < listings[listingId].priceInNative) revert InCorrectPrice(msg.value, listings[listingId].priceInNative);
+        if(!listings[listingId].isActive) revert NotActive(listingId);
+        if(listingId[listingId].chainId != 1287) revert InvalidChainId(listingId[listingId].chainId);
+        orders[orderIdCounter]=Order(orderIdCounter, listingId, listings[listingId].chainId, msg.sender, OrderStatus.COMPLETED);
+        listings[listingId].isActive = false;
+        claimables[listings[listingId].seller] += listings[listingId].priceInNative;
+        IERC721(listings[listingId].tokenAddress).safeTransferFrom(listings[listingId].seller, msg.sender, listings[listingId].tokenId);
+        emit NftPurchaseCompleted(orderIdCounter);
+        orderIdCounter++;
+    }
 
-    function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue , uint256 gasLimit) public payable {
+    function purchaseNftViaWormhole(uint256 listingId, uint256 receiverValue , uint256 gasLimit) public payable {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
         uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue, gasLimit);
         
@@ -167,6 +178,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         }else{
             orders[orderId].status = OrderStatus.FAILED;
             claimables[orders[orderId].buyer] += listings[orders[orderId].listingId].priceInNative;
+            listings[orders[orderId].listingId].isActive = true;
             emit NftPurchaseFailed(orderId);
         }
     }
