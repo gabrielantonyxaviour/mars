@@ -41,6 +41,7 @@ export default function Import() {
   const [progress, setProgress] = useState(0);
   const [approveSignature, setApproveSignature] = useState<`0x${string}`>();
   const [txHash, setTxHash] = useState<string>("");
+  const [transactionConfirmed, setTransactionConfirmed] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState("");
@@ -229,7 +230,7 @@ export default function Import() {
                       "200000",
                       mintFee,
                     ]);
-                    await mintNft({
+                    const tx = await mintNft({
                       abi: venusMoonbaseNftAbi,
                       address: venusMoonbaseNftAddress,
                       functionName: "mintImportNft",
@@ -241,6 +242,16 @@ export default function Import() {
                         "200000",
                       ],
                       value: mintFee,
+                    });
+                    setTxHash(tx);
+                    const unwatch = publicClient.watchContractEvent({
+                      address: venusMoonbaseNftAddress,
+                      abi: venusMoonbaseNftAbi,
+                      onLogs: async (logs) => {
+                        console.log("Logged!");
+                        setTransactionConfirmed(true);
+                        unwatch();
+                      },
                     });
                   } catch (e) {
                     console.log(e);
@@ -314,7 +325,7 @@ export default function Import() {
       <TransactionStatusCreate
         destinationChainId={selectedChain}
         sourceTransactionHash={txHash as string}
-        transactionConfirmed={false}
+        transactionConfirmed={transactionConfirmed}
       />
     </Layout>
   );
