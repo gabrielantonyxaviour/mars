@@ -35,11 +35,6 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
     event NFTMinted(uint256 tokenId, address minter, string tokenUri, bool nftType);
     event CrosschainMintSent(uint256 tokenId, address minter, string tokenUri, bool nftType, uint256 chainId);
 
-    modifier isSignedByOwner(bytes memory signature){
-        address recoveredAddress=_getHashedData(_nextTokenId).recover(signature);
-        if(recoveredAddress != owner()) revert InvalidSignature(recoveredAddress);
-        _;
-    }
 
     function updateAiMintFee(uint256 _aiMintFee) public onlyOwner {
         aiMintFee=_aiMintFee;
@@ -56,7 +51,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         }
     }
 
-    function mintAiNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) isSignedByOwner(signature) public payable{
+    function mintAiNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) public payable{
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
         uint256 cost = quoteCrossChainCall(wormholeChainId);
         
@@ -78,7 +73,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         }
     }
 
-    function mintImportNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) isSignedByOwner(signature) public  payable {
+    function mintImportNft(address _to, string memory _uri, bytes memory signature, uint256 chainId) public  payable {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
         uint256 cost = quoteCrossChainCall(wormholeChainId);
         
@@ -133,7 +128,4 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
         return super.supportsInterface(interfaceId);
     }
 
-    function _getHashedData(uint256 tokenId) internal view returns(bytes32){
-        return keccak256(abi.encodePacked(KEY_HASH, tokenId));
-    }
 }

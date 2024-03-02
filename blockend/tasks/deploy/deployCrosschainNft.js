@@ -12,17 +12,16 @@ task("deploy-cross-nft", "Deploys the VenusCrosschainNft contract")
 
     console.log("\n__Compiling Contracts__");
     await run("compile");
-    const wormholeRelayer = networks.moonbaseAlpha.wormholeRelayer;
+    const wormholeRelayer = networks[network.name].wormholeRelayer;
     const minterAddress = networks.moonbaseAlpha.minterAddress;
     const minterWormholeChainId = networks.moonbaseAlpha.wormholeChainId;
     const sampleNftFactory = await ethers.getContractFactory(
       "VenusCrosschainNft"
     );
     const sampleNft = await sampleNftFactory.deploy(
-      initialOwner,
       wormholeRelayer,
-      aiMintFee,
-      importMintFee
+      minterAddress,
+      minterWormholeChainId
     );
 
     console.log(
@@ -58,10 +57,9 @@ task("deploy-cross-nft", "Deploys the VenusCrosschainNft contract")
         await run("verify:verify", {
           address: sampleNft.address,
           constructorArguments: [
-            initialOwner,
             wormholeRelayer,
-            aiMintFee,
-            importMintFee,
+            minterAddress,
+            minterWormholeChainId,
           ],
         });
         console.log("Contract verified");
