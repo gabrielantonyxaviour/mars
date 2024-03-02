@@ -89,9 +89,9 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         }
     }
 
-    function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue , uint256 gasLimit) public payable  returns(uint256 orderId){
+    function purchaseNFTViaWormhole(uint256 listingId, uint256 receiverValue , uint256 gasLimit) public payable {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[listings[listingId].chainId];
-        uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue);
+        uint256 cost=quoteCrossChainCall(wormholeChainId, receiverValue, gasLimit);
         
         if(msg.value < listings[listingId].priceInNative+cost) revert InCorrectPrice(msg.value, listings[listingId].priceInNative+cost);
         if(!listings[listingId].isActive) revert NotActive(listingId);
@@ -111,7 +111,6 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         emit NftPurchaseInitiated(orderIdCounter, listingId, wormholeChainId, msg.sender, msg.value);
         
         orderIdCounter++;
-        return orderIdCounter-1;
     }
 
 

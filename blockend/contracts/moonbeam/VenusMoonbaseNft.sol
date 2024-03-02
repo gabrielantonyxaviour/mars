@@ -52,7 +52,7 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
 
     function mintAiNft(address _to, string memory _uri, bytes memory signature, uint256 chainId, uint256 gasLimit) public payable{
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
-        uint256 cost = quoteCrossChainCall(wormholeChainId);
+        uint256 cost = quoteCrossChainCall(wormholeChainId, gasLimit);
         
         if(msg.value < aiMintFee + cost) revert NotEnoughFee(msg.value);
         if(chainId != 1287){
@@ -74,18 +74,18 @@ contract VenusMoonbaseNft is ERC721, ERC721URIStorage, Ownable {
 
     function mintImportNft(address _to, string memory _uri, bytes memory signature, uint256 chainId, uint256 gasLimit) public  payable {
         uint16 wormholeChainId = chainIdsToWormholeChainIds[chainId];
-        uint256 cost = quoteCrossChainCall(wormholeChainId);
+        uint256 cost = quoteCrossChainCall(wormholeChainId, gasLimit);
         
         if(msg.value < importMintFee + cost) revert NotEnoughFee(msg.value);
         if(chainId != 1287){
-            wormholeRelayer.sendPayloadToEvm {value: cost} (
+            wormholeRelayer.sendPayloadToEvm{value: cost}(
                 wormholeChainId,
                 whitelistedWormholeAddresses[wormholeChainId],
                 abi.encode(_to, _uri, false), // payload
                 0, // no receiver value needed since we're just passing a message
                 gasLimit,
                 wormholeChainId,
-                owner
+                owner()
             );
             emit CrosschainMintSent(_nextTokenId, _to, _uri, true, chainId);
             _nextTokenId+=1;
