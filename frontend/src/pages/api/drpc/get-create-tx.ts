@@ -18,7 +18,7 @@ export default async function handler(
 
   const responseData = await response.json();
   console.log("\n=====================");
-  console.log("GET CREATE TXZ DATA");
+  console.log("GET CREATE TX DATA");
   console.log(responseData.data);
   console.log("=====================");
 

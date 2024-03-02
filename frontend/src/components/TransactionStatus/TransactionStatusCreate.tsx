@@ -24,9 +24,11 @@ export default function TransactionStatusCreate({
 
   useEffect(() => {
     (async function fetchS() {
+      console.log(destinationChainId);
       if (destinationChainId != "1287") {
-        const interval = setInterval(() => {
-          const posRes = axios.post(
+        console.log("HELLO");
+        const interval = setInterval(async () => {
+          const posRes = await axios.post(
             "/api/drpc/get-create-tx",
             {
               chainId: destinationChainId,
@@ -38,14 +40,19 @@ export default function TransactionStatusCreate({
               },
             }
           );
-          if ((posRes as any).data != null) {
-            setDestinationTransactionHash((posRes as any).data[0].txHash);
+
+          if (posRes.data != null) {
+            console.log(
+              "Destination Transaction Hash: ",
+              posRes.data[0].transactionHash
+            );
+            setDestinationTransactionHash(posRes.data[0].transactionHash);
           }
         }, 5000);
         return () => clearInterval(interval);
       }
     })();
-  }, []);
+  }, [destinationChainId]);
 
   return (
     sourceTransactionHash != "" && (
