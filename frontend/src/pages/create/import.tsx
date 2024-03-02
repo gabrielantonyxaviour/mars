@@ -192,13 +192,10 @@ export default function Import() {
               <button
                 onClick={async () => {
                   try {
-                    const base64Image = await readFileAsBase64(
-                      selectedFile as File
-                    );
-                    console.log(base64Image);
+                    console.log(imageSrc);
                     const imageRes = await axios.post(
                       "/api/pinata/image",
-                      JSON.stringify({ file: base64Image }),
+                      JSON.stringify({ file: imageSrc }),
                       {
                         headers: {
                           "Content-Type": "application/json",

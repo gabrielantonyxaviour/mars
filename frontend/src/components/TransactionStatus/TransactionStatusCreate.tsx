@@ -4,8 +4,10 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function TransactionStatusCreate({
   sourceTransactionHash,
@@ -18,8 +20,33 @@ export default function TransactionStatusCreate({
 }) {
   const [destinationTransactionHash, setDestinationTransactionHash] =
     useState("");
-  const [destinationTransactionConfirmed, setDestinationTransactionConfirmed] =
-    useState(false);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    (async function fetchS() {
+      if (destinationChainId != "1287") {
+        const interval = setInterval(() => {
+          const posRes = axios.post(
+            "/api/drpc/get-create-tx",
+            {
+              chainId: destinationChainId,
+              minter: address,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if ((posRes as any).data != null) {
+            setDestinationTransactionHash((posRes as any).data[0].txHash);
+          }
+        }, 5000);
+        return () => clearInterval(interval);
+      }
+    })();
+  }, []);
+
   return (
     sourceTransactionHash != "" && (
       <div className="w-[70%] mx-auto">
@@ -64,13 +91,31 @@ export default function TransactionStatusCreate({
 
           {destinationChainId != "1287" && (
             <>
-              <div
-                className={`border-b border-dashed ${
-                  destinationTransactionConfirmed
-                    ? "border-[#00B418]"
-                    : "border-[#F0DE00]"
-                } my-auto flex-1 mx-6`}
-              ></div>
+              <div className="my-auto flex-1 ">
+                <div className="flex justify-center pb-2">
+                  <a
+                    className="text-xs text-[#9c9e9e] text-center w-full"
+                    href={
+                      "https://wormholescan.io/#/tx/" + sourceTransactionHash
+                    }
+                    target={"_blank"}
+                  >
+                    WormholeScan{" "}
+                    <FontAwesomeIcon
+                      icon={faArrowUpRightFromSquare}
+                      className="ml-2"
+                    />
+                  </a>
+                </div>
+
+                <div
+                  className={`border-b border-dashed ${
+                    destinationTransactionHash != ""
+                      ? "border-[#00B418]"
+                      : "border-[#F0DE00]"
+                  } mx-6`}
+                ></div>
+              </div>
               <div>
                 <Image
                   src={`/chains/${destinationChainId}.png`}
@@ -80,7 +125,7 @@ export default function TransactionStatusCreate({
                   className="my-auto"
                 />
                 <p className="text-[#a9a9a9] font-semibold text-center mt-2 text-sm">
-                  {destinationTransactionConfirmed
+                  {destinationTransactionHash != ""
                     ? "Confirm ✔️"
                     : "Pending ⏳"}
                 </p>

@@ -6,6 +6,7 @@ const nextConfig = {
       "otvzzmqknnjthpuwmrpb.supabase.co",
       "silver-absolute-wren-28.mypinata.cloud",
       "img.midjourneyapi.xyz",
+      "amber-accessible-porpoise-584.mypinata.cloud",
     ],
   },
 };
