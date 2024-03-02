@@ -1,0 +1,21 @@
+{
+  "name": "NFT Artwork",
+  "description": "A unique digital artwork stored on the blockchain as an NFT.",
+  "image": "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmZmPuuuUPChE97D2aDnQMz39b8PwZyktGPb95vs1K56Nb",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "ETHDenver"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "1 of 10"
+    },
+    {
+      "trait_type": "Creation Date",
+      "value": "2024-02-29"
+    }
+  ],
+  "external_url": "https://example.com/artwork-details",
+  "background_color": "FFFFFF"
+}

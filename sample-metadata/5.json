@@ -1,0 +1,21 @@
+{
+  "name": "NFT Artwork",
+  "description": "A unique digital artwork stored on the blockchain as an NFT.",
+  "image": "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/Qmci3PZ3KfPrnBG5EwNbfQmE8kiw9VP43EuUu7t77m1Ruf",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Abstract"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "1 of 10"
+    },
+    {
+      "trait_type": "Creation Date",
+      "value": "2024-02-29"
+    }
+  ],
+  "external_url": "https://example.com/artwork-details",
+  "background_color": "FFFFFF"
+}
