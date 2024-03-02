@@ -4,7 +4,7 @@ const nextConfig = {
     domains: [
       "cloudflare-ipfs.com",
       "otvzzmqknnjthpuwmrpb.supabase.co",
-      "amber-accessible-porpoise-584.mypinata.cloud",
+      "silver-absolute-wren-28.mypinata.cloud",
       "img.midjourneyapi.xyz",
     ],
   },

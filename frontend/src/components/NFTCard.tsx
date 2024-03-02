@@ -43,7 +43,7 @@ export default function NFTCard({
         setImage(_image);
       } catch (e) {
         setImage(
-          "https://amber-accessible-porpoise-584.mypinata.cloud/ipfs/QmPbFa12vQjYiy9E1G7SQskVvFNgyxcJnwiMjHSNABWzYk"
+          "https://silver-absolute-wren-28.mypinata.cloud/ipfs/QmPbFa12vQjYiy9E1G7SQskVvFNgyxcJnwiMjHSNABWzYk"
         );
       }
     })();
