@@ -17,18 +17,21 @@ app.use(morgan("common"));
 const api = require("./routes/api");
 app.use("/api", api);
 
-/* Viem Implementation */
-const { createPublicClient, http, parseAbi } = require("viem");
+const {
+  mumbaiClient,
+  sepoliaClient,
+  baseSepoliaClient,
+  arbitrumSepoliaClient,
+  moonbeamAlphaClient,
+} = require("./clients");
+const { parseAbi } = require("viem");
 const connectorABI = require("./data/connector.abi.json");
 const nftABI = require("./data/nft.abi.json");
 const venusABI = require("./data/venus.abi.json");
 const venusNFTABI = require("./data/venusNFT.abi.json");
 
-const mumbaiClient = createPublicClient({
-  transport: http(
-    `https://lb.drpc.org/ogrpc?network=polygon-mumbai&dkey=${process.env.DRPC_API_KEY}`
-  ),
-});
+/* Viem Implementation */
+
 let mumbaiContracts = [
   {
     address: process.env.POLYGON_MUMBAI_CONNECTOR,
@@ -47,11 +50,6 @@ let mumbaiContracts = [
   },
 ];
 
-const sepoliaClient = createPublicClient({
-  transport: http(
-    `https://lb.drpc.org/ogrpc?network=sepolia&dkey=${process.env.DRPC_API_KEY}`
-  ),
-});
 let sepoliaContracts = [
   {
     address: process.env.ETHERUM_SEPOLIA_CONNECTOR,
@@ -70,11 +68,6 @@ let sepoliaContracts = [
   },
 ];
 
-const baseSepoliaClient = createPublicClient({
-  transport: http(
-    `https://lb.drpc.org/ogrpc?network=base-sepolia&dkey=${process.env.DRPC_API_KEY}`
-  ),
-});
 let baseSepoliaContracts = [
   {
     address: process.env.BASE_SEPOLIA_CONNECTOR,
@@ -93,11 +86,6 @@ let baseSepoliaContracts = [
   },
 ];
 
-const arbitrumSepoliaClient = createPublicClient({
-  transport: http(
-    `https://lb.drpc.org/ogrpc?network=arbitrum-sepolia&dkey=${process.env.DRPC_API_KEY}`
-  ),
-});
 let arbitrumSepoliaContracts = [
   {
     address: process.env.ARBITRUM_SEPOLIA_CONNECTOR,
@@ -116,11 +104,6 @@ let arbitrumSepoliaContracts = [
   },
 ];
 
-const moonbeamAlphaClient = createPublicClient({
-  transport: http(
-    `https://lb.drpc.org/ogrpc?network=moonbase-alpha&dkey=${process.env.DRPC_API_KEY}`
-  ),
-});
 let moonbeamAlphaContracts = [
   {
     address: process.env.VENUS_PROTOCOL,
@@ -164,36 +147,6 @@ function convertSolidityAbiToHumanReadable(abi) {
   }
 }
 
-// async function scrapeMumabiData() {
-//   const latest = await mumbaiClient.getBlockNumber();
-//   // let maximumBlock = BigInt(700);
-//   for (let i = 0; i < mumbaiContracts.length; i++) {
-//     console.log({
-//       address: mumbaiContracts[i].address,
-//       from: BigInt(mumbaiContracts[i].block),
-//       to: latest,
-//     });
-//     const contract = mumbaiContracts[i];
-//     const logs = await mumbaiClient.getLogs({
-//       address: contract.address,
-//       events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-//       fromBlock: BigInt(contract.block),
-//       toBlock: latest,
-//     });
-//     for (let j = 0; j < logs.length; j++) {
-//       const log = logs[j];
-//       const data = {
-//         ...log,
-//         timestamp: Date.now(),
-//         network: "polygon-mumbai",
-//       };
-//       await db.collection("events").insertOne(data);
-//     }
-//   }
-
-//   // let currentStartBlock = BigInt(mumbaiContracts.connectorBlock);
-// }
-
 async function scrapeMumabiData() {
   for (let i = 0; i < mumbaiContracts.length; i++) {
     const contract = mumbaiContracts[i];
@@ -219,6 +172,7 @@ async function scrapeMumabiData() {
         const data = {
           ...log,
           timestamp: Date.now(),
+          chainId: 80001,
           network: "polygon-mumbai",
         };
         await db.collection("events").insertOne(data);
@@ -259,6 +213,7 @@ async function scrapeSepoliaData() {
         const data = {
           ...log,
           timestamp: Date.now(),
+          chainId: 11155111,
           network: "ethereum-sepolia",
         };
         await db.collection("events").insertOne(data);
@@ -299,6 +254,7 @@ async function scrapeBaseSepoliaData() {
         const data = {
           ...log,
           timestamp: Date.now(),
+          chainId: 84532,
           network: "base-sepolia",
         };
         await db.collection("events").insertOne(data);
@@ -339,6 +295,7 @@ async function scrapeArbitrumSepoliaData() {
         const data = {
           ...log,
           timestamp: Date.now(),
+          chainId: 421614,
           network: "arbitrum-sepolia",
         };
         await db.collection("events").insertOne(data);
@@ -379,6 +336,7 @@ async function scrapeMoonbeamAlphaData() {
         const data = {
           ...log,
           timestamp: Date.now(),
+          chainId: 1287,
           network: "moonbeam-alpha",
         };
 
@@ -394,16 +352,6 @@ async function scrapeMoonbeamAlphaData() {
   }
 }
 
-// Watch events for a contract
-
-// setInterval(() => {
-//   scrapeMumabiData();
-//   scrapeSepoliaData();
-//   scrapeBaseSepoliaData();
-//   scrapeArbitrumSepoliaData();
-//   scrapeMoonbeamAlphaData();
-// }, 60000);
-
 const watchContracts = () => {
   for (let i = 0; i < mumbaiContracts.length; i++) {
     const contract = mumbaiContracts[i];
@@ -417,6 +365,7 @@ const watchContracts = () => {
           const data = {
             ...log,
             timestamp: Date.now(),
+            chainId: 80001,
             network: "polygon-mumbai",
           };
           await db.collection("events").insertOne(data);
@@ -437,6 +386,7 @@ const watchContracts = () => {
           const data = {
             ...log,
             timestamp: Date.now(),
+            chainId: 11155111,
             network: "ethereum-sepolia",
           };
           await db.collection("events").insertOne(data);
@@ -457,6 +407,7 @@ const watchContracts = () => {
           const data = {
             ...log,
             timestamp: Date.now(),
+            chainId: 84532,
             network: "base-sepolia",
           };
           await db.collection("events").insertOne(data);
@@ -477,6 +428,7 @@ const watchContracts = () => {
           const data = {
             ...log,
             timestamp: Date.now(),
+            chainId: 421614,
             network: "arbitrum-sepolia",
           };
           await db.collection("events").insertOne(data);
@@ -497,6 +449,7 @@ const watchContracts = () => {
           const data = {
             ...log,
             timestamp: Date.now(),
+            chainId: 1287,
             network: "moonbeam-alpha",
           };
           await db.collection("events").insertOne(data);
@@ -533,7 +486,7 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   client.connect().then(() => {
     console.log("Connected to MongoDB");
-    // main();
+    main();
   });
   console.log(`App listening at http://localhost:${port}`);
 });

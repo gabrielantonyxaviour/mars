@@ -119,11 +119,30 @@ router.get("/nfts/:owner", async (req, res) => {
     });
   }
 
+  // console.log(filter);
+
   const data = await db
     .collection("events")
     .aggregate([
       {
         $match: filter,
+      },
+      {
+        $project: {
+          address: 1,
+          tokenId: "$args.tokenId",
+          owner: {
+            $ifNull: ["$args.to", "$args.minter"],
+          },
+          chainId: 1,
+          network: "$network",
+          internal: {
+            $eq: ["$eventName", "NFTMinted"],
+          },
+          aiMinted: {
+            $eq: ["$args.nftType", true],
+          },
+        },
       },
     ])
     .toArray();
@@ -151,6 +170,17 @@ router.get("/orders/:owner", async (req, res) => {
     .aggregate([
       {
         $match: filter,
+      },
+      {
+        $project: {
+          address: 1,
+          seller: "$args.seller",
+          chainId: 1,
+          network: 1,
+          timestamp: 1,
+          orderID: "$args.orderId",
+          price: "$args.pricePaidInNative",
+        },
       },
     ])
     .toArray();
@@ -193,6 +223,20 @@ router.get("/listings", async (req, res) => {
       {
         $match: filter,
       },
+      {
+        $project: {
+          address: 1,
+          tokenId: "$args.tokenId",
+          seller: "$args.seller",
+          chainId: 1,
+          network: 1,
+          timestamp: 1,
+          validity: "$args.validity",
+          price: "$args.priceInNative",
+          listingID: "$args.listingId",
+          nativeChainId: "$args.chainId",
+        },
+      },
     ])
     .toArray();
   res.json({
@@ -217,6 +261,20 @@ router.get("/listings/:owner", async (req, res) => {
       {
         $match: filter,
       },
+      {
+        $project: {
+          address: 1,
+          tokenId: "$args.tokenId",
+          seller: "$args.seller",
+          chainId: 1,
+          network: 1,
+          timestamp: 1,
+          validity: "$args.validity",
+          price: "$args.priceInNative",
+          listingID: "$args.listingId",
+          nativeChainId: "$args.chainId",
+        },
+      },
     ])
     .toArray();
   res.json({
@@ -226,15 +284,84 @@ router.get("/listings/:owner", async (req, res) => {
 });
 
 router.get("/order/:orderID", async (req, res) => {
-  const orderID = req.params.orderID;
-  const filter = {
-    $and: [{ "args.orderId": orderID }],
-  };
   const data = await db
     .collection("events")
     .aggregate([
       {
-        $match: filter,
+        $match: {
+          "args.orderId": parseInt(req.params.orderID),
+        },
+      },
+      {
+        $project: {
+          initiated: {
+            $cond: [
+              {
+                $eq: ["$eventName", "NftPurchaseInitiated"],
+              },
+              "$transactionHash",
+              null,
+            ],
+          },
+          relayed: {
+            $cond: [
+              {
+                $eq: ["$eventName", "ConfirmationRelayed"],
+              },
+              "$transactionHash",
+              null,
+            ],
+          },
+          completed: {
+            $cond: [
+              {
+                $eq: ["$eventName", "NftPurchaseCompleted"],
+              },
+              "$transactionHash",
+              null,
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          relayed: {
+            $push: "$relayed",
+          },
+          initiated: {
+            $push: "$initiated",
+          },
+          completed: {
+            $push: "$completed",
+          },
+        },
+      },
+      {
+        $project: {
+          relayed: {
+            $setDifference: ["$relayed", [null]],
+          },
+          initiated: {
+            $setDifference: ["$initiated", [null]],
+          },
+          completed: {
+            $setDifference: ["$completed", [null]],
+          },
+        },
+      },
+      {
+        $project: {
+          initiated: {
+            $arrayElemAt: ["$initiated", 0],
+          },
+          completed: {
+            $arrayElemAt: ["$completed", 0],
+          },
+          relayed: {
+            $arrayElemAt: ["$relayed", 0],
+          },
+        },
       },
     ])
     .toArray();
@@ -247,13 +374,27 @@ router.get("/order/:orderID", async (req, res) => {
 router.get("/listing/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
   const filter = {
-    $and: [{ "args.listingId": listingID }],
+    $and: [{ "args.listingId": parseInt(listingID) }],
   };
   const data = await db
     .collection("events")
     .aggregate([
       {
         $match: filter,
+      },
+      {
+        $project: {
+          address: 1,
+          tokenId: "$args.tokenId",
+          seller: "$args.seller",
+          chainId: 1,
+          network: 1,
+          timestamp: 1,
+          validity: "$args.validity",
+          price: "$args.priceInNative",
+          listingID: "$args.listingId",
+          nativeChainId: "$args.chainId",
+        },
       },
     ])
     .toArray();
@@ -271,7 +412,7 @@ router.get("/nft/:tokenAddress/:tokenId", async (req, res) => {
         $match: {
           $and: [
             {
-              eventName: 'Transfer'
+              eventName: "Transfer",
             },
             {
               address: req.params.tokenAddress.toLowerCase(),
@@ -281,7 +422,17 @@ router.get("/nft/:tokenAddress/:tokenId", async (req, res) => {
             },
           ],
         },
+        
       },
+      {
+        $project: {
+          address: 1,
+          tokenId: '$args.tokenId',
+          owner: '$args.to',
+          chainId: 1,
+          network: 1
+        }
+      }
     ])
     .toArray();
   res.json({

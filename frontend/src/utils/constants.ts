@@ -1,5 +1,5 @@
 export const MIDJOURNEY_BASE_URL = "https://api.midjourneyapi.xyz/mj/v2";
-
+export const DRPC_BASE_URL = "https://ethdenver-files.onrender.com/";
 export const chains: { [key: string]: string } = {
   "80001": "Polygon Mumbai",
   "1287": "Moonbase Alpha",

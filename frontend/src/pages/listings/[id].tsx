@@ -9,19 +9,45 @@ import Image from "next/image";
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { WalletClient, decodeEventLog } from "viem";
-import { useAccount } from "wagmi";
+import {
+  WalletClient,
+  createPublicClient,
+  decodeEventLog,
+  formatUnits,
+  getContract,
+  http,
+} from "viem";
+import { useAccount, useWriteContract } from "wagmi";
 import useWindowSize from "@/hooks/useWindowSize";
-import { explorers } from "@/utils/constants";
+import {
+  explorers,
+  protocolAddress,
+  venusConnectorAbi,
+  venusConnectorAddresses,
+  venusProtocolAbi,
+  wormholeChainIds,
+} from "@/utils/constants";
 import { shortenEthereumAddress } from "@/utils";
-
+import {
+  arbitrumSepolia,
+  baseSepolia,
+  moonbaseAlpha,
+  polygonMumbai,
+  sepolia,
+} from "viem/chains";
+function resolveChain(chainId: string) {
+  if (chainId == "1287") return moonbaseAlpha;
+  else if (chainId == "80001") return polygonMumbai;
+  else if (chainId == "11155111") return sepolia;
+  else if (chainId == "84532") return baseSepolia;
+  else return arbitrumSepolia;
+}
 export default function Listing() {
   const router = useRouter();
   const { address } = useAccount();
   const { id } = router.query;
   const { width, height } = useWindowSize();
   const [txHash, setTxHash] = useState("");
-  const [pairBred, setPairBred] = useState("");
   const [tokenAddress, setTokenAddress] = useState(
     "0xd04b45920bcf51518338f783bdc1544844775f21"
   );
@@ -30,7 +56,47 @@ export default function Listing() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [createdAt, setCreatedAt] = useState("2024-02-28 15:45:36.180961+00");
   const [validity, setValidity] = useState(8000000);
+  const [listingPrice, setListingPrice] = useState(12);
+  const [receiverValue, setReceiverValue] = useState(BigInt(0));
+  const [mintFee, setMintFee] = useState(BigInt(0));
+  const { writeContractAsync: purchaseNft } = useWriteContract();
+  const publicClient = createPublicClient({
+    chain: resolveChain(chainId),
+    transport: http(),
+  });
 
+  const publicClientMoonbeam = createPublicClient({
+    chain: moonbaseAlpha,
+    transport: http(),
+  });
+  const contract = getContract({
+    address: venusConnectorAddresses[chainId] as `0x${string}`,
+    abi: venusConnectorAbi,
+    client: publicClient,
+  });
+
+  const protcolContact = getContract({
+    address: protocolAddress as `0x${string}`,
+    abi: venusProtocolAbi,
+    client: publicClient,
+  });
+  useEffect(() => {
+    (async function getMintFee() {
+      const response = await contract.read.quoteCrossChainCall([
+        wormholeChainIds[chainId],
+        "200000",
+      ]);
+      console.log(response);
+      setReceiverValue(response as bigint);
+      const query = await protcolContact.read.quoteCrossChainCall([
+        chainId,
+        response,
+        "200000",
+      ]);
+      console.log(query);
+      setMintFee(query as bigint);
+    })();
+  }, [chainId]);
   useEffect(() => {
     const targetTimestamp =
       Math.floor(new Date(createdAt).getTime() / 1000) + validity;
@@ -57,9 +123,7 @@ export default function Listing() {
 
   return (
     <Layout>
-      {txHash != "" && pairBred != "" && (
-        <Confetti width={width} height={height} />
-      )}
+      {txHash != "" && <Confetti width={width} height={height} />}
 
       <div className="min-h-[90vh] mt-20 w-[80%] mx-auto flex justify-between">
         <div className="flex justify-between w-full">
@@ -115,7 +179,7 @@ export default function Listing() {
                 <p className="font-semibold text-md">Price</p>
                 <div className="flex-1 py-auto">
                   <p className="mt-6 font-semibold text-xl text-[#9c9e9e] ">
-                    {20} GLMR
+                    {listingPrice} GLMR
                   </p>
                 </div>
               </div>
@@ -157,7 +221,27 @@ export default function Listing() {
             </div>
             <div className="mt-8 flex justify-center">
               <button
-                onClick={async () => {}}
+                onClick={async () => {
+                  if (chainId == "1287") {
+                    const tx = await purchaseNft({
+                      address: protocolAddress as `0x${string}`,
+                      abi: venusProtocolAbi,
+                      functionName: "purchaseNft",
+                      args: [id as string],
+                      value: BigInt(formatUnits(BigInt(listingPrice), 18)),
+                    });
+                    setTxHash(tx);
+                  } else {
+                    const tx = await purchaseNft({
+                      address: protocolAddress as `0x${string}`,
+                      abi: venusProtocolAbi,
+                      functionName: "purchaseNftViaWormhole",
+                      args: [id as string, "", "200000"],
+                      value: BigInt(formatUnits(BigInt(listingPrice), 18)),
+                    });
+                    setTxHash(tx);
+                  }
+                }}
                 // disabled={}
                 className={`${
                   false ? "bg-[#25272b] text-[#5b5e5b]" : "bg-white text-black"
