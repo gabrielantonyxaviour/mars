@@ -27,7 +27,8 @@ const networks = {
     wormholeChainId: "16",
     wormholeCore: "0xa5B7D85a8f27dd7907dc8FdC21FA5657D5E2F901",
     wormholeRelayer: "0x0591C25ebd0580E0d4F27A82Fc2e24E7489CB5e0",
-    protocol: "0xFD6a2699FFd3293c646498388077B66b2e459130",
+    minterAddress: "0x0C29b8C5121a4a72E9D623eFe418875fc7E3Dd15",
+    protocol: "",
   },
   ethereumSepolia: {
     url: "https://ethereum-sepolia-rpc.publicnode.com",
@@ -40,7 +41,8 @@ const networks = {
     nativeCurrencySymbol: "ETH",
     wormholeChainId: "10002",
     wormholeRelayer: "0x7B1bD7a6b4E61c2a123AC6BC2cbfC614437D0470",
-    connector: "0x178F1a1d6C37824B8CB5AcF0FF54D1cbf3D1317A",
+    crossMintAddress: "",
+    connector: "",
   },
   polygonMumbai: {
     url: "https://polygon-mumbai-pokt.nodies.app",
@@ -52,9 +54,9 @@ const networks = {
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "MATIC",
     wormholeChainId: "5",
-    wormholeCoreBridge: "0x0CBE91CF822c73C2315FB05100C2F714765d5c20",
-    testing: "0x615270a5CBA6C1e34D7F8BCB5D26a5BC9285fA20",
-    connector: "0xA3539Ae35C914950717FCf993716CbC980d8bc72",
+    wormholeRelayer: "",
+    crossMintAddress: "",
+    connector: "",
   },
   baseSepolia: {
     url: "https://base-sepolia-rpc.publicnode.com",
@@ -65,7 +67,9 @@ const networks = {
     chainId: 84532,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "ETH",
-    connector: "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37",
+    wormholeRelayer: "",
+    crossMintAddress: "",
+    connector: "",
   },
   arbitrumSepolia: {
     url: "https://sepolia-rollup.arbitrum.io/rpc",
@@ -76,7 +80,9 @@ const networks = {
     chainId: 421614,
     confirmations: DEFAULT_VERIFICATION_BLOCK_CONFIRMATIONS,
     nativeCurrencySymbol: "ETH",
-    connector: "0x16CBC6Cb38D19B73A3b545109c70b2031d20EA37",
+    wormholeRelayer: "",
+    crossMintAddress: "",
+    connector: "",
   },
 };
 

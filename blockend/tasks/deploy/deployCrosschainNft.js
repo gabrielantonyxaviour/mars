@@ -15,7 +15,6 @@ task("deploy-cross-nft", "Deploys the VenusCrosschainNft contract")
     const wormholeRelayer = networks.moonbaseAlpha.wormholeRelayer;
     const minterAddress = networks.moonbaseAlpha.minterAddress;
     const minterWormholeChainId = networks.moonbaseAlpha.wormholeChainId;
-    // address _wormholeRelayer, address _minterAddress, uint16 _minterWormholeChainId
     const sampleNftFactory = await ethers.getContractFactory(
       "VenusCrosschainNft"
     );
