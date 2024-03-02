@@ -5,7 +5,10 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const contractABI = require("./data/abi.json");
+const connectorABI = require("./data/connector.abi.json");
+const nftABI = require("./data/nft.abi.json");
+const venusABI = require("./data/venus.abi.json");
+const venusNFTABI = require("./data/venusNFT.abi.json");
 const { ethers } = require("ethers");
 require("dotenv").config();
 
@@ -19,78 +22,88 @@ app.use(morgan("common"));
 const api = require("./routes/api");
 app.use("/api", api);
 
-
 /* DRPC Providers Starts */
 const etherumSepoliaProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=sepolia&dkey=${process.env.DRPC_API_KEY}`
 );
-const ethereumSepoliaContractAddress = process.env.ETHERUM_SEPOLIA;
+const ethereumSepoliaConnector = process.env.ETHERUM_SEPOLIA_CONNECTOR;
+const ethereumSepoliaNFT = process.env.ETHERUM_SEPOLIA_NFT;
 const polygonMumbaiProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=polygon-mumbai&dkey=${process.env.DRPC_API_KEY}`
 );
-const polygonMumbaiContractAddress = process.env.POLYGON_MUMBAI;
-const lineaGoerliProvider = new ethers.providers.JsonRpcProvider(
-  `https://lb.drpc.org/ogrpc?network=linea-goerli&dkey=${process.env.DRPC_API_KEY}`
-);
-const lineaGoerliContractAddress = process.env.LINEA_GOERLI;
+const polygonMumbaiConnector = process.env.POLYGON_MUMBAI_CONNECTOR;
+const polygonMumbaiNFT = process.env.POLYGON_MUMBAI_NFT;
 const baseSepoliaProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=base-sepolia&dkey=${process.env.DRPC_API_KEY}`
 );
-const baseSepoliaContractAddress = process.env.BASE_SEPOLIA;
+const baseSepoliaConnector = process.env.BASE_SEPOLIA_CONNECTOR;
+const baseSepoliaNFT = process.env.BASE_SEPOLIA_NFT;
 const arbitrumSepoliaProvider = new ethers.providers.JsonRpcProvider(
   `https://lb.drpc.org/ogrpc?network=arbitrum-sepolia&dkey=${process.env.DRPC_API_KEY}`
 );
-const arbitrumSepoliaContractAddress = process.env.ARBITRUM_SEPOLIA;
+const arbitrumSepoliaConnector = process.env.ARBITRUM_SEPOLIA_CONNECTOR;
+const arbitrumSepoliaNFT = process.env.ARBITRUM_SEPOLIA_NFT;
+const moonbeamAlphaProvider = new ethers.providers.JsonRpcProvider(
+  `https://lb.drpc.org/ogrpc?network=moonbase-alpha&dkey=${process.env.DRPC_API_KEY}`
+);
+const venusProtocol = process.env.VENUS_PROTOCOL;
+const venusNFT = process.env.VENUS_NFT;
 /* DRPC Providers Ends */
 
-/* Custom Providers Starts */
-const injectiveEvmProvider = new ethers.providers.JsonRpcProvider(
-  "https://testnet.rpc.inevm.com/http"
-);
-const injectiveEvmContractAddress = process.env.INJECTIVE_EVM;
-const zircuitProvider = new ethers.providers.JsonRpcProvider(
-  "https://zircuit1.p2pify.com"
-);
-const zircuitContractAddress = process.env.ZIRCUIT_TESTNET;
-/* Custom Providers Ends */
-
-const ethereumSepoliaInstance = new ethers.Contract(
-  ethereumSepoliaContractAddress,
-  contractABI,
+const ethereumSepoliaConnectorInstance = new ethers.Contract(
+  ethereumSepoliaConnector,
+  connectorABI,
   etherumSepoliaProvider
 );
-const polygonMumbaiInstance = new ethers.Contract(
-  polygonMumbaiContractAddress,
-  contractABI,
+const polygonMumbaiConnectorInstance = new ethers.Contract(
+  polygonMumbaiConnector,
+  connectorABI,
   polygonMumbaiProvider
 );
-const lineaGoerliInstance = new ethers.Contract(
-  lineaGoerliContractAddress,
-  contractABI,
-  lineaGoerliProvider
-);
-const baseSepoliaInstance = new ethers.Contract(
-  baseSepoliaContractAddress,
-  contractABI,
+const baseSepoliaConnectorInstance = new ethers.Contract(
+  baseSepoliaConnector,
+  connectorABI,
   baseSepoliaProvider
 );
-const arbitrumSepoliaInstance = new ethers.Contract(
-  arbitrumSepoliaContractAddress,
-  contractABI,
+const arbitrumSepoliaConnectorInstance = new ethers.Contract(
+  arbitrumSepoliaConnector,
+  connectorABI,
   arbitrumSepoliaProvider
 );
-const injectiveEvmInstance = new ethers.Contract(
-  injectiveEvmContractAddress,
-  contractABI,
-  injectiveEvmProvider
+
+const ethereumSepoliaNFTInstance = new ethers.Contract(
+  ethereumSepoliaNFT,
+  nftABI,
+  etherumSepoliaProvider
 );
-const zircuitInstance = new ethers.Contract(
-  zircuitContractAddress,
-  contractABI,
-  zircuitProvider
+const polygonMumbaiNFTInstance = new ethers.Contract(
+  polygonMumbaiNFT,
+  nftABI,
+  polygonMumbaiProvider
+);
+const baseSepoliaNFTInstance = new ethers.Contract(
+  baseSepoliaNFT,
+  nftABI,
+  baseSepoliaProvider
+);
+const arbitrumSepoliaNFTInstance = new ethers.Contract(
+  arbitrumSepoliaNFT,
+  nftABI,
+  arbitrumSepoliaProvider
 );
 
-ethereumSepoliaInstance.on("*", async (event) => {
+const venusProtocolInstance = new ethers.Contract(
+  venusProtocol,
+  venusABI,
+  moonbeamAlphaProvider
+);
+const venusNFTInstance = new ethers.Contract(
+  venusNFT,
+  venusNFTABI,
+  moonbeamAlphaProvider
+);
+
+ethereumSepoliaConnectorInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
@@ -100,7 +113,7 @@ ethereumSepoliaInstance.on("*", async (event) => {
   console.log("Ethereum Sepolia:", data);
 });
 
-polygonMumbaiInstance.on("*", async (event) => {
+polygonMumbaiConnectorInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
@@ -110,17 +123,7 @@ polygonMumbaiInstance.on("*", async (event) => {
   console.log("Polygon Mumbai:", data);
 });
 
-lineaGoerliInstance.on("*", async (event) => {
-  let data = {
-    ...event,
-    timestamp: Date.now(),
-    network: "linea-goerli",
-  };
-  await db.collection("events").insertOne(data);
-  console.log("Linea Goerli:", data);
-});
-
-baseSepoliaInstance.on("*", async (event) => {
+baseSepoliaConnectorInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
@@ -130,7 +133,7 @@ baseSepoliaInstance.on("*", async (event) => {
   console.log("Base Sepolia:", data);
 });
 
-arbitrumSepoliaInstance.on("*", async (event) => {
+arbitrumSepoliaConnectorInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
@@ -140,39 +143,101 @@ arbitrumSepoliaInstance.on("*", async (event) => {
   console.log("Arbitrum Sepolia:", data);
 });
 
-injectiveEvmInstance.on("*", async (event) => {
+ethereumSepoliaNFTInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
-    network: "injective-evm",
+    network: "ethereum-sepolia",
   };
   await db.collection("events").insertOne(data);
-  console.log("Injective EVM:", data);
+  console.log("Ethereum Sepolia NFT:", data);
 });
 
-zircuitInstance.on("*", async (event) => {
+polygonMumbaiNFTInstance.on("*", async (event) => {
   let data = {
     ...event,
     timestamp: Date.now(),
-    network: "zircuit",
+    network: "polygon-mumbai",
   };
   await db.collection("events").insertOne(data);
-  console.log("Zircuit:", data);
+  console.log("Polygon Mumbai NFT:", data);
 });
+
+baseSepoliaNFTInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "base-sepolia",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Base Sepolia NFT:", data);
+});
+
+arbitrumSepoliaNFTInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "arbitrum-sepolia",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Arbitrum Sepolia NFT:", data);
+});
+
+venusProtocolInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "moonbeam-alpha",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Venus Protocol:", data);
+});
+
+venusNFTInstance.on("*", async (event) => {
+  let data = {
+    ...event,
+    timestamp: Date.now(),
+    network: "moonbeam-alpha",
+  };
+  await db.collection("events").insertOne(data);
+  console.log("Venus NFT:", data);
+});
+
+const ethereumSepoliaContractAddress = {
+  connector: ethereumSepoliaConnector,
+  nft: ethereumSepoliaNFT,
+};
+
+const polygonMumbaiContractAddress = {
+  connector: polygonMumbaiConnector,
+  nft: polygonMumbaiNFT,
+};
+
+const baseSepoliaContractAddress = {
+  connector: baseSepoliaConnector,
+  nft: baseSepoliaNFT,
+};
+
+const arbitrumSepoliaContractAddress = {
+  connector: arbitrumSepoliaConnector,
+  nft: arbitrumSepoliaNFT,
+};
+
+const moonbeamAlphaContractAddress = {
+  protocol: venusProtocol,
+  nft: venusNFT,
+};
+
 
 app.get("/", (req, res) => {
   res.json({
     success: true,
     data: {
-      connectorAddress: {
-        ethereumSepolia: ethereumSepoliaContractAddress,
-        polygonMumbai: polygonMumbaiContractAddress,
-        lineaGoerli: lineaGoerliContractAddress,
-        baseSepolia: baseSepoliaContractAddress,
-        arbitrumSepolia: arbitrumSepoliaContractAddress,
-        injectiveEvm: injectiveEvmContractAddress,
-        zircuit: zircuitContractAddress
-      },
+      ethereumSepoliaContractAddress,
+      polygonMumbaiContractAddress,
+      baseSepoliaContractAddress,
+      arbitrumSepoliaContractAddress,
+      moonbeamAlphaContractAddress,
     },
   });
 });
