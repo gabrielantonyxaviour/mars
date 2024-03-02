@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import NFTCard from "../NFTCard";
 import ListingCard from "../ListingCard";
-import OrderCard from "../OrderCard";
 import axios from "axios";
 
 export default function Profile(props: { address: string }) {
@@ -97,18 +96,6 @@ export default function Profile(props: { address: string }) {
         >
           Listings
         </button>
-        <button
-          onClick={() => {
-            setSelected(2);
-          }}
-          className={`mx-2  ${
-            selected == 2
-              ? "bg-[#d0d1d1] text-black"
-              : "hover:bg-[#25272b] text-white "
-          } p-2 rounded-md font-semibold `}
-        >
-          Orders
-        </button>
       </div>
       <div className="mx-6 h-[1px] bg-[#3c3f41] mt-6"></div>
       <div className="flex justify-between mt-10">
@@ -158,19 +145,6 @@ export default function Profile(props: { address: string }) {
                 size={300}
               />
             )} */}
-            {selected == 2 && (
-              <OrderCard
-                image={
-                  "https://img.midjourneyapi.xyz/mj/9be0aacb-8978-4c82-88fb-495dee1efe41.png"
-                }
-                orderId={"3"}
-                chainId={"2424"}
-                createdAt="2024-02-28 15:45:36.180961+00"
-                status={"PENDING"}
-                mode={"create 🪄"}
-                size={300}
-              />
-            )}
           </div>
         </div>
       </div>

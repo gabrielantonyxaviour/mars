@@ -11,10 +11,12 @@ export default function TransactionStatusOrder({
   sourceTransactionHash,
   destinationChainId,
   transactionConfirmed,
+  orderId,
 }: {
   destinationChainId: string;
   sourceTransactionHash: string;
   transactionConfirmed: boolean;
+  orderId: string;
 }) {
   const [destinationTransactionHash, setDestinationTransactionHash] =
     useState("");

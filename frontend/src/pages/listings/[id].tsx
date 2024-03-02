@@ -31,6 +31,8 @@ import { shortenEthereumAddress } from "@/utils";
 import { moonbaseAlpha } from "viem/chains";
 import axios from "axios";
 import resolveChain from "@/utils/resolveChain";
+import TransactionStatusOrder from "@/components/TransactionStatus/TransactionStatusOrder";
+import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
 
 export default function Listing() {
   const router = useRouter();
@@ -38,12 +40,17 @@ export default function Listing() {
   const { width, height } = useWindowSize();
   const { address } = useAccount();
   const [txHash, setTxHash] = useState("");
+  const [txConfirmed, setTxConfirmed] = useState(false);
   const [receiverValue, setReceiverValue] = useState(BigInt(0));
   const [mintFee, setMintFee] = useState(BigInt(0));
   const [listing, setListing] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const { writeContractAsync: purchaseNft } = useWriteContract();
-
+  const [orderId, setOrderId] = useState("");
+  const publicClient = createPublicClient({
+    chain: moonbaseAlpha,
+    transport: http(),
+  });
   useEffect(() => {
     (async function getListing() {
       console.log(id);
@@ -134,7 +141,7 @@ export default function Listing() {
       {txHash != "" && <Confetti width={width} height={height} />}
 
       {listing != null && (
-        <div className="min-h-[90vh] mt-20 w-[80%] mx-auto flex justify-between">
+        <div className=" mt-20 mb-12 w-[80%] mx-auto flex justify-between">
           <div className="flex justify-between w-full">
             <div className="flex flex-col">
               <NFTCard
@@ -240,6 +247,17 @@ export default function Listing() {
                       });
                       setTxHash(tx);
                     } else {
+                      const unwatch = publicClient.watchContractEvent({
+                        address: protocolAddress as `0x${string}`,
+                        abi: venusProtocolAbi,
+                        onLogs: async (logs: any) => {
+                          console.log("Logged!");
+                          console.log(logs[0].args.orderId);
+                          setOrderId(logs[0].args.orderId);
+                          setTxConfirmed(true);
+                          unwatch();
+                        },
+                      });
                       const tx = await purchaseNft({
                         address: protocolAddress as `0x${string}`,
                         abi: venusProtocolAbi,
@@ -267,6 +285,21 @@ export default function Listing() {
           </div>
         </div>
       )}
+      {listing != null &&
+        (listing.chainId == "1287" ? (
+          <TransactionStatusCreate
+            destinationChainId={listing.chainId}
+            sourceTransactionHash={txHash as string}
+            transactionConfirmed={txConfirmed}
+          />
+        ) : (
+          <TransactionStatusOrder
+            sourceTransactionHash={txHash}
+            destinationChainId={listing.chainId}
+            transactionConfirmed={txConfirmed}
+            orderId={orderId}
+          />
+        ))}
     </Layout>
   );
 }
