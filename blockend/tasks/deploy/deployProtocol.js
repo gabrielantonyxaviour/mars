@@ -16,6 +16,8 @@ task("deploy-protocol", "Deploys the VenusProtocol contract")
     const wormhoelCore = networks[network.name].wormholeCore;
     const wormholeRelayer = networks[network.name].wormholeRelayer;
 
+    console.log([wormhoelCore, wormholeRelayer]);
+
     const protocolContractFactory = await ethers.getContractFactory(
       "VenusProtocol"
     );

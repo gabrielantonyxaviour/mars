@@ -59,13 +59,14 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     uint256 public orderIdCounter;
     uint256 public listingIdCounter;
     address public owner;
+    bool public crossChainVerificationEnabled;
     IWormholeRelayer public immutable wormholeRelayer;
+    
 
     event NFTListed(uint256 listingId, address seller, address tokenAddress, uint256 tokenId, uint256 chainId, uint256 validity, uint256 priceInNative);
     event NftPurchaseInitiated(uint256 orderId, uint256 foreignChainListingId, uint256 wormholeChainId, address buyer, uint256 pricePaidInNative);
     event NftPurchaseCompleted(uint256 orderId);
     event NftPurchaseFailed(uint256 orderId);
-    event CrossChainQueryLogger(ParsedQueryResponse r, EthCallQueryResponse eqr, address owner);
     event ClaimablesClaimed(address receiver, uint256 amount);
 
     constructor(address _wormholeCoreAddress, address _wormholeRelayer) QueryResponse(_wormholeCoreAddress)  {
@@ -115,9 +116,9 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
 
 
     function listNft(address tokenAddress, uint256 tokenId, uint256 nativePrice, uint256 validity, uint256 chainId, CrossChainQueryData calldata _crosschainQueryData) public {
-        // Wormhole Cross chain queries for fetching approval
-        // verify owner of the nft, verify approval
-        // require(verifyApprovalCrossChainQuery(response, signatures), "Approval not verified");
+        if(crossChainVerificationEnabled){
+            require(verifyApprovalCrossChainQuery(_crosschainQueryData), "Approval not verified");
+        }
         listings[listingIdCounter] = Listing(msg.sender, tokenAddress, tokenId, chainId, nativePrice, validity, true);
         emit NFTListed(listingIdCounter, msg.sender,  tokenAddress,  tokenId,  chainId,  validity,  nativePrice);
         listingIdCounter++;
@@ -127,18 +128,20 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
         return orderIdCounter;
     }
 
-    function getListingIdCounte() public view returns(uint256){
+    function getListingIdCounter() public view returns(uint256){
         return listingIdCounter;
     }
-    function verifyApprovalCrossChainQuery(CrossChainQueryData calldata __crosschainQueryData) public returns(bool){
+    function verifyApprovalCrossChainQuery(CrossChainQueryData calldata __crosschainQueryData) public view returns(bool){
         IWormhole.Signature[] memory signatures = new IWormhole.Signature[](1);
         signatures[0] = IWormhole.Signature(__crosschainQueryData.r,__crosschainQueryData.s, __crosschainQueryData.v, __crosschainQueryData.guardianIndex);
         ParsedQueryResponse memory r = parseAndVerifyQueryResponse(__crosschainQueryData.response, signatures);
         EthCallQueryResponse memory eqr = parseEthCallQueryResponse(r.responses[0]);
-        address _owner=abi.decode(eqr.result[0].result, (address));
 
-        emit CrossChainQueryLogger(r, eqr, _owner);
-        return _owner == msg.sender;
+        return abi.decode(eqr.result[0].result, (bool));
+    }
+
+    function setCrossChainVerificationEnabled(bool state) public {
+        crossChainVerificationEnabled=state;
     }
 
 
