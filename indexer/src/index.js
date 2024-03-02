@@ -204,7 +204,9 @@ async function scrapeMumabiData() {
     let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
     while (startBlock <= latestBlock) {
-      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      console.log(
+        `Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`
+      );
       const logs = await mumbaiClient.getLogs({
         address: contract.address,
         events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
@@ -241,7 +243,9 @@ async function scrapeSepoliaData() {
     let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
     while (startBlock <= latestBlock) {
-      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      console.log(
+        `Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`
+      );
 
       const logs = await sepoliaClient.getLogs({
         address: contract.address,
@@ -279,7 +283,9 @@ async function scrapeBaseSepoliaData() {
     let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
     while (startBlock <= latestBlock) {
-      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      console.log(
+        `Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`
+      );
 
       const logs = await baseSepoliaClient.getLogs({
         address: contract.address,
@@ -317,7 +323,9 @@ async function scrapeArbitrumSepoliaData() {
     let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
     while (startBlock <= latestBlock) {
-      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      console.log(
+        `Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`
+      );
 
       const logs = await arbitrumSepoliaClient.getLogs({
         address: contract.address,
@@ -355,7 +363,9 @@ async function scrapeMoonbeamAlphaData() {
     let endBlock = Math.min(parseInt(startBlock + 700), parseInt(latestBlock));
 
     while (startBlock <= latestBlock) {
-      console.log(`Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`)
+      console.log(
+        `Scraping from ${startBlock} to ${endBlock} for contract ${contract.address}`
+      );
 
       const logs = await moonbeamAlphaClient.getLogs({
         address: contract.address,
@@ -394,117 +404,136 @@ async function scrapeMoonbeamAlphaData() {
 //   scrapeMoonbeamAlphaData();
 // }, 60000);
 
-scrapeMumabiData();
-scrapeSepoliaData();
-scrapeBaseSepoliaData();
-scrapeArbitrumSepoliaData();
-scrapeMoonbeamAlphaData();
+const watchContracts = () => {
+  for (let i = 0; i < mumbaiContracts.length; i++) {
+    const contract = mumbaiContracts[i];
+    console.log(`Watching contract ${contract.address}`);
+    mumbaiClient.watchEvent({
+      address: contract.address,
+      events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+      onLogs: async (logs) => {
+        for (let j = 0; j < logs.length; j++) {
+          const log = logs[j];
+          const data = {
+            ...log,
+            timestamp: Date.now(),
+            network: "polygon-mumbai",
+          };
+          await db.collection("events").insertOne(data);
+        }
+      },
+    });
+  }
+
+  for (let i = 0; i < sepoliaContracts.length; i++) {
+    const contract = sepoliaContracts[i];
+    console.log(`Watching contract ${contract.address}`);
+    sepoliaClient.watchEvent({
+      address: contract.address,
+      events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+      onLogs: async (logs) => {
+        for (let j = 0; j < logs.length; j++) {
+          const log = logs[j];
+          const data = {
+            ...log,
+            timestamp: Date.now(),
+            network: "ethereum-sepolia",
+          };
+          await db.collection("events").insertOne(data);
+        }
+      },
+    });
+  }
+
+  for (let i = 0; i < baseSepoliaContracts.length; i++) {
+    const contract = baseSepoliaContracts[i];
+    console.log(`Watching contract ${contract.address}`);
+    baseSepoliaClient.watchEvent({
+      address: contract.address,
+      events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+      onLogs: async (logs) => {
+        for (let j = 0; j < logs.length; j++) {
+          const log = logs[j];
+          const data = {
+            ...log,
+            timestamp: Date.now(),
+            network: "base-sepolia",
+          };
+          await db.collection("events").insertOne(data);
+        }
+      },
+    });
+  }
+
+  for (let i = 0; i < arbitrumSepoliaContracts.length; i++) {
+    const contract = arbitrumSepoliaContracts[i];
+    console.log(`Watching contract ${contract.address}`);
+    arbitrumSepoliaClient.watchEvent({
+      address: contract.address,
+      events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+      onLogs: async (logs) => {
+        for (let j = 0; j < logs.length; j++) {
+          const log = logs[j];
+          const data = {
+            ...log,
+            timestamp: Date.now(),
+            network: "arbitrum-sepolia",
+          };
+          await db.collection("events").insertOne(data);
+        }
+      },
+    });
+  }
+
+  for (let i = 0; i < moonbeamAlphaContracts.length; i++) {
+    const contract = moonbeamAlphaContracts[i];
+    console.log(`Watching contract ${contract.address}`);
+    moonbeamAlphaClient.watchEvent({
+      address: contract.address,
+      events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
+      onLogs: async (logs) => {
+        for (let j = 0; j < logs.length; j++) {
+          const log = logs[j];
+          const data = {
+            ...log,
+            timestamp: Date.now(),
+            network: "moonbeam-alpha",
+          };
+          await db.collection("events").insertOne(data);
+        }
+      },
+    });
+  }
+};
+
+const main = async () => {
+  await scrapeMumabiData();
+  console.log("Scraped Mumbai Data");
+  await scrapeSepoliaData();
+  console.log("Scraped Sepolia Data");
+  await scrapeBaseSepoliaData();
+  console.log("Scraped Base Sepolia Data");
+  await scrapeArbitrumSepoliaData();
+  console.log("Scraped Arbitrum Sepolia Data");
+  await scrapeMoonbeamAlphaData();
+  console.log("Scraped Moonbeam Alpha Data");
+  console.log("Watching Contracts...");
+  watchContracts();
+};
 
 /* Viem Implementation Ends */
 
-for (let i = 0; i < mumbaiContracts.length; i++) {
-  const contract = mumbaiContracts[i];
-  console.log(`Watching contract ${contract.address}`)
-  mumbaiClient.watchEvent({
-    address: contract.address,
-    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-    onLogs: async (logs) => {
-      for (let j = 0; j < logs.length; j++) {
-        const log = logs[j];
-        const data = {
-          ...log,
-          timestamp: Date.now(),
-          network: "polygon-mumbai",
-        };
-        await db.collection("events").insertOne(data);
-      }
-    },
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "DRPC Indexer",
   });
-}
-
-for (let i = 0; i < sepoliaContracts.length; i++) {
-  const contract = sepoliaContracts[i];
-  console.log(`Watching contract ${contract.address}`)
-  sepoliaClient.watchEvent({
-    address: contract.address,
-    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-    onLogs: async (logs) => {
-      for (let j = 0; j < logs.length; j++) {
-        const log = logs[j];
-        const data = {
-          ...log,
-          timestamp: Date.now(),
-          network: "sepolia",
-        };
-        await db.collection("events").insertOne(data);
-      }
-    },
-  });
-}
-
-for (let i = 0; i < baseSepoliaContracts.length; i++) {
-  const contract = baseSepoliaContracts[i];
-  console.log(`Watching contract ${contract.address}`)
-  baseSepoliaClient.watchEvent({
-    address: contract.address,
-    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-    onLogs: async (logs) => {
-      for (let j = 0; j < logs.length; j++) {
-        const log = logs[j];
-        const data = {
-          ...log,
-          timestamp: Date.now(),
-          network: "base-sepolia",
-        };
-        await db.collection("events").insertOne(data);
-      }
-    },
-  });
-}
-
-for (let i = 0; i < arbitrumSepoliaContracts.length; i++) {
-  const contract = arbitrumSepoliaContracts[i];
-  console.log(`Watching contract ${contract.address}`)
-  arbitrumSepoliaClient.watchEvent({
-    address: contract.address,
-    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-    onLogs: async (logs) => {
-      for (let j = 0; j < logs.length; j++) {
-        const log = logs[j];
-        const data = {
-          ...log,
-          timestamp: Date.now(),
-          network: "arbitrum-sepolia",
-        };
-        await db.collection("events").insertOne(data);
-      }
-    },
-  });
-}
-
-for (let i = 0; i < moonbeamAlphaContracts.length; i++) {
-  const contract = moonbeamAlphaContracts[i];
-  console.log(`Watching contract ${contract.address}`)
-  moonbeamAlphaClient.watchEvent({
-    address: contract.address,
-    events: parseAbi(convertSolidityAbiToHumanReadable(contract.abi)),
-    onLogs: async (logs) => {
-      for (let j = 0; j < logs.length; j++) {
-        const log = logs[j];
-        const data = {
-          ...log,
-          timestamp: Date.now(),
-          network: "moonbeam-alpha",
-        };
-        await db.collection("events").insertOne(data);
-      }
-    },
-  });
-}
+});
 
 app.listen(port, () => {
   client.connect().then(() => {
     console.log("Connected to MongoDB");
+    // main();
   });
   console.log(`App listening at http://localhost:${port}`);
 });
