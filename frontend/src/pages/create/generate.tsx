@@ -7,7 +7,13 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Confetti from "react-confetti";
 import useWindowSize from "@/hooks/useWindowSize";
-import { decodeEventLog, formatUnits } from "viem";
+import {
+  createPublicClient,
+  decodeEventLog,
+  formatUnits,
+  getContract,
+  http,
+} from "viem";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
@@ -15,6 +21,12 @@ import { useChainModal } from "@rainbow-me/rainbowkit";
 import GenerateButton from "@/components/GenerateButton";
 import TransactionStatusCreate from "@/components/TransactionStatus/TransactionStatusCreate";
 import ChooseChainDropdown from "@/components/Dropdown/ChooseChainDropdown";
+import {
+  venusMoonbaseNftAbi,
+  venusMoonbaseNftAddress,
+  wormholeChainIds,
+} from "@/utils/constants";
+import { moonbaseAlpha } from "viem/chains";
 export default function Generate() {
   const router = useRouter();
   const { chain: chainQueryParam } = router.query;
@@ -29,6 +41,7 @@ export default function Generate() {
   const [txHash, setTxHash] = useState<string>("");
   const { openChainModal } = useChainModal();
   const [selectedChain, setSelectedChain] = useState("1287");
+  const [mintFee, setMintFee] = useState<bigint>(BigInt(0));
   const [chains, setChains] = useState([
     "1287",
     "80001",
@@ -37,6 +50,25 @@ export default function Generate() {
     "84532",
     "421614",
   ]);
+  const publicClient = createPublicClient({
+    chain: moonbaseAlpha,
+    transport: http(),
+  });
+  const contract = getContract({
+    address: venusMoonbaseNftAddress,
+    abi: venusMoonbaseNftAbi,
+    client: publicClient,
+  });
+  useEffect(() => {
+    (async function getMintFee() {
+      const response = await contract.read.quoteCrossChainCall([
+        wormholeChainIds[selectedChain],
+        "200000",
+      ]);
+      console.log(response);
+      setMintFee(response as bigint);
+    })();
+  }, [selectedChain]);
 
   useEffect(() => {
     console.log("WE ARE HERE");
@@ -208,6 +240,9 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        publicClient={publicClient}
+                        mintFee={mintFee}
+                        selectedChain={selectedChain}
                         setFetchTime={setFetchTime}
                         index="1"
                         setChooseImage={setChooseImage}
@@ -217,6 +252,9 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        publicClient={publicClient}
+                        mintFee={mintFee}
+                        selectedChain={selectedChain}
                         setFetchTime={setFetchTime}
                         index="2"
                         setChooseImage={setChooseImage}
@@ -226,6 +264,9 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        publicClient={publicClient}
+                        mintFee={mintFee}
+                        selectedChain={selectedChain}
                         setFetchTime={setFetchTime}
                         index="3"
                         setChooseImage={setChooseImage}
@@ -235,6 +276,9 @@ export default function Generate() {
                         setCount={setCount}
                         setMessageId={setMessageId}
                         messageId={messageId}
+                        publicClient={publicClient}
+                        mintFee={mintFee}
+                        selectedChain={selectedChain}
                         setFetchTime={setFetchTime}
                         index="4"
                         setChooseImage={setChooseImage}

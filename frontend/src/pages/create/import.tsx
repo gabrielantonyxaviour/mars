@@ -221,7 +221,6 @@ export default function Import() {
                         "Content-Type": "application/json",
                       },
                     });
-                    let uri = "00";
                     console.log([
                       address as string,
                       res.data.IpfsHash,
@@ -230,6 +229,14 @@ export default function Import() {
                       "200000",
                       mintFee,
                     ]);
+                    const unwatch = publicClient.watchContractEvent({
+                      address: venusMoonbaseNftAddress,
+                      abi: venusMoonbaseNftAbi,
+                      onLogs: async (logs) => {
+                        console.log("Logged!");
+                        setTransactionConfirmed(true);
+                      },
+                    });
                     const tx = await mintNft({
                       abi: venusMoonbaseNftAbi,
                       address: venusMoonbaseNftAddress,
@@ -244,14 +251,6 @@ export default function Import() {
                       value: mintFee,
                     });
                     setTxHash(tx);
-                    const unwatch = publicClient.watchContractEvent({
-                      address: venusMoonbaseNftAddress,
-                      abi: venusMoonbaseNftAbi,
-                      onLogs: async (logs) => {
-                        console.log("Logged!");
-                        setTransactionConfirmed(true);
-                      },
-                    });
                   } catch (e) {
                     console.log(e);
                   }

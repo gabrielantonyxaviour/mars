@@ -1,9 +1,20 @@
+import {
+  venusMoonbaseNftAbi,
+  venusMoonbaseNftAddress,
+} from "@/utils/constants";
+import axios from "axios";
 import React from "react";
+import { createPublicClient, http } from "viem";
+import { moonbaseAlpha } from "viem/chains";
+import { useAccount, useWriteContract } from "wagmi";
 
 export default function GenerateButton({
   setCount,
   setMessageId,
   messageId,
+  mintFee,
+  selectedChain,
+  publicClient,
   setFetchTime,
   index,
   setChooseImage,
@@ -12,11 +23,17 @@ export default function GenerateButton({
   setCount: React.Dispatch<React.SetStateAction<number>>;
   setMessageId: React.Dispatch<React.SetStateAction<string>>;
   messageId: string;
+  publicClient: any;
+  mintFee: bigint;
+  selectedChain: string;
   setFetchTime: React.Dispatch<React.SetStateAction<number>>;
   index: string;
   setChooseImage: React.Dispatch<React.SetStateAction<string>>;
   setTxHash: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const { writeContractAsync: mintNft } = useWriteContract();
+  const { address } = useAccount();
+
   return (
     <button
       className="bg-[#25272b] mx-2 my-2 py-2 px-6 rounded-lg"
@@ -49,11 +66,40 @@ export default function GenerateButton({
           setFetchTime(fetchedImage.process_time);
         }
         setChooseImage(fetchedImage.task_result.image_url);
-        setCount(4);
-        setMessageId("");
-        setTxHash(
-          "0x463df055eb7059b3e742ffc0d0e4c3daacdfead5b0a7dac4bdc3fa9da339cad5"
-        );
+
+        const metadata = {
+          name: "NFT Artwork",
+          description:
+            "A unique digital artwork stored on the blockchain as an NFT.",
+          image: fetchedImage.task_result.image_url,
+          attributes: [],
+          external_url: "https://venus-nine.vercel.app/",
+          background_color: "FFFFFF",
+        };
+
+        const resData = await axios.post("/api/pinata/json", metadata, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const unwatch = publicClient.watchContractEvent({
+          address: venusMoonbaseNftAddress,
+          abi: venusMoonbaseNftAbi,
+          onLogs: async (logs: any) => {
+            console.log("Logged!");
+            setCount(4);
+            setMessageId("");
+          },
+        });
+        const tx = await mintNft({
+          address: venusMoonbaseNftAddress,
+          abi: venusMoonbaseNftAbi,
+          functionName: "mintImportNft",
+          args: [address, resData.data.IpfsHash, "0x", selectedChain, "200000"],
+          value: mintFee,
+        });
+
+        setTxHash(tx);
       }}
     >
       <p>
