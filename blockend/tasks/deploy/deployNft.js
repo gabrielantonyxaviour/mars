@@ -1,6 +1,6 @@
 const { networks } = require("../../networks");
 
-task("deploy-sample-nft", "Deploys the SampleNft contract")
+task("deploy-sample-nft", "Deploys the NFT contract")
   .addOptionalParam(
     "verify",
     "Set to true to verify contract",
@@ -8,14 +8,15 @@ task("deploy-sample-nft", "Deploys the SampleNft contract")
     types.boolean
   )
   .setAction(async (taskArgs) => {
-    console.log(`Deploying SampleNft contract to ${network.name}`);
+    const nftContract = "NFT_A";
+    console.log(`Deploying NFT_A contract to ${network.name}`);
 
     console.log("\n__Compiling Contracts__");
     await run("compile");
 
     const initalOwner = "0x0429A2Da7884CA14E53142988D5845952fE4DF6a";
 
-    const sampleNftFactory = await ethers.getContractFactory("SampleNft");
+    const sampleNftFactory = await ethers.getContractFactory("NFT_A");
     const sampleNft = await sampleNftFactory.deploy(initalOwner);
 
     console.log(
@@ -30,7 +31,7 @@ task("deploy-sample-nft", "Deploys the SampleNft contract")
       networks[network.name].confirmations
     );
 
-    console.log("\nDeployed SampleNft contract to:", sampleNft.address);
+    console.log("\nDeployed NFT_A contract to:", sampleNft.address);
 
     if (network.name === "localFunctionsTestnet") {
       return;
@@ -67,6 +68,6 @@ task("deploy-sample-nft", "Deploys the SampleNft contract")
     }
 
     console.log(
-      `\n SampleNft contract deployed to ${sampleNft.address} on ${network.name}`
+      `\n NFT_A contract deployed to ${sampleNft.address} on ${network.name}`
     );
   });
