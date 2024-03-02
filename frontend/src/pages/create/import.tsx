@@ -250,7 +250,6 @@ export default function Import() {
                       onLogs: async (logs) => {
                         console.log("Logged!");
                         setTransactionConfirmed(true);
-                        unwatch();
                       },
                     });
                   } catch (e) {
