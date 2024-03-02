@@ -486,7 +486,7 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   client.connect().then(() => {
     console.log("Connected to MongoDB");
-    main();
+    // main();
   });
   console.log(`App listening at http://localhost:${port}`);
 });

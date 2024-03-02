@@ -504,4 +504,32 @@ router.get("/nft/:tokenAddress/:tokenId", async (req, res) => {
   });
 });
 
+router.get("/crosschain/status/:chain/:tokenId", async (req, res) => {
+  const chainId = req.params.chain;
+  const tokenId = req.params.tokenId;
+  const data = await db
+    .collection("events")
+    .aggregate([
+      {
+        $match: {
+          $and: [
+            { eventName: "NFTMinted" },
+            { chainId: parseInt(chainId) },
+            { "args.tokenId": parseInt(tokenId) },
+          ],
+        },
+      },
+      {
+        $project: {
+          transactionHash: 1,
+        },
+      },
+    ])
+    .toArray();
+  res.json({
+    success: true,
+    data,
+  });
+});
+
 module.exports = router;
