@@ -13,7 +13,7 @@ error NotActive(uint256 listingId);
 error NotWhiteListedChain(uint16 chainId);
 error NotWhiteListedAddress(address sender);
 error NotRelayer(address sender);
-error InvalidChainId(uint256 chainId);
+error InvalidChain(uint256 chainId);
 
 contract VenusProtocol is QueryResponse, IWormholeReceiver {
 
@@ -92,7 +92,7 @@ contract VenusProtocol is QueryResponse, IWormholeReceiver {
     function purchaseNft(uint256 listingId) public payable {
         if(msg.value < listings[listingId].priceInNative) revert InCorrectPrice(msg.value, listings[listingId].priceInNative);
         if(!listings[listingId].isActive) revert NotActive(listingId);
-        if(listingId[listingId].chainId != 1287) revert InvalidChainId(listingId[listingId].chainId);
+        if(listings[listingId].chainId != 1287) revert InvalidChain(listings[listingId].chainId);
         orders[orderIdCounter]=Order(orderIdCounter, listingId, listings[listingId].chainId, msg.sender, OrderStatus.COMPLETED);
         listings[listingId].isActive = false;
         claimables[listings[listingId].seller] += listings[listingId].priceInNative;
